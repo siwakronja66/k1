@@ -1,0 +1,22 @@
+{
+  "name": "ssjmuk3d",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "vendor": "node tools/vendor.mjs",
+    "build:css": "tailwindcss -c tailwind.config.cjs -i src-css/app.css -o public/vendor/app.css --minify",
+    "seed": "node tools/extract-seed.mjs",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "build": "npm run vendor && npm run build:css"
+  },
+  "devDependencies": {
+    "@fontsource/prompt": "5.1.1",
+    "@fontsource/sarabun": "5.1.1",
+    "@fortawesome/fontawesome-free": "6.5.1",
+    "@playwright/test": "^1.65.0",
+    "qrcode-generator": "1.4.4",
+    "tailwindcss": "3.4.17",
+    "three": "0.128.0"
+  }
+}

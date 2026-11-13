@@ -1,0 +1,7 @@
+.env
+node_modules/
+.playwright-mcp/
+test-results/
+backups/
+# public/vendor is tracked (1.4MB) so production servers do not require Node.js/npm build
+

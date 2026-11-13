@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ผังอาคาร 3 มิติ สสจ.มุกดาหาร</title>
+    <meta name="description" content="ผังอาคาร 3 มิติ และค้นหากลุ่มงาน สำนักงานสาธารณสุขจังหวัดมุกดาหาร">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="vendor/fonts.css">
+    <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
+    <link rel="stylesheet" href="vendor/app.css">
+    <style>
+        /* Desktop (md+): Floating UI Overlay - Zero Canvas Movement & Beautiful Rounded Edges */
+        @media (min-width: 768px) {
+            #sidebar-panel {
+                position: absolute;
+                top: 0.75rem;
+                right: 0.75rem;
+                bottom: 0.75rem;
+                width: 20rem; /* 320px */
+                z-index: 30;
+                border-radius: 1.25rem; /* rounded-2xl */
+                background: rgba(15, 23, 42, 0.94);
+                backdrop-filter: blur(14px);
+                -webkit-backdrop-filter: blur(14px);
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(16, 185, 129, 0.15);
+                overflow: hidden;
+                transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                            opacity 0.22s ease,
+                            visibility 0.28s;
+                will-change: transform, opacity;
+            }
+
+            #sidebar-panel.is-collapsed {
+                transform: translateX(calc(100% + 2rem));
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            #sidebar-panel {
+                width: 24rem; /* 384px */
+            }
+        }
+
+        /* Mobile (< 768px): Responsive Bottom Panel */
+        @media (max-width: 767.98px) {
+            #sidebar-panel {
+                position: relative;
+                background: #0f172a;
+                border-top: 1px solid rgba(51, 65, 85, 0.8);
+                border-top-left-radius: 1rem;
+                border-top-right-radius: 1rem;
+                overflow: hidden;
+                transition: height 0.22s ease,
+                            opacity 0.18s ease,
+                            visibility 0.22s;
+            }
+
+            #sidebar-panel.is-collapsed {
+                height: 0 !important;
+                min-height: 0 !important;
+                border-top-width: 0 !important;
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+            }
+        }
+
+        .sidebar-content-wrapper {
+            width: 100%;
+            height: 100%;
+            min-width: 0;
+        }
+
+        /* Floating expand button with matching aesthetic */
+        #btn-expand-sidebar {
+            transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                        visibility 0.2s;
+            will-change: transform, opacity;
+        }
+        #btn-expand-sidebar.btn-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(-6px) scale(0.95);
+        }
+        #btn-expand-sidebar.btn-visible {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+        }
+
+        /* Room detail accordion */
+        #room-detail-body {
+            overflow: hidden;
+            max-height: 420px;
+            transition: max-height 0.22s ease,
+                        opacity 0.18s ease,
+                        visibility 0.22s;
+            opacity: 1;
+            visibility: visible;
+        }
+        #room-detail-body.is-collapsed {
+            max-height: 0 !important;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* Chevron toggle icon transition */
+        #icon-toggle-room-detail {
+            transition: transform 0.18s ease;
+        }
+
+        /* Official MOPH Emblem - Large, High-Res & Grand Bounding Box */
+        .moph-logo-badge {
+            width: 3.25rem; /* 52px on mobile */
+            height: 3.25rem;
+            min-width: 3.25rem;
+            min-height: 3.25rem;
+            max-width: 3.25rem;
+            max-height: 3.25rem;
+            flex-shrink: 0;
+        }
+        @media (min-width: 640px) {
+            .moph-logo-badge {
+                width: 4rem; /* 64px on sm & desktop */
+                height: 4rem;
+                min-width: 4rem;
+                min-height: 4rem;
+                max-width: 4rem;
+                max-height: 4rem;
+            }
+        }
+
+        /* Header Subtitle Tagline */
+        .header-tagline {
+            display: none;
+        }
+        @media (min-width: 1024px) {
+            .header-tagline {
+                display: inline-block;
+            }
+        }
+
+        /* Floor Dropdown Popover */
+        #floor-dropdown-menu.hidden {
+            display: none !important;
+        }
+
+        /* Left Spots Panel - Smooth Slide Collapse into the Left Side */
+        #left-spots-panel {
+            transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+                        opacity 0.22s ease,
+                        visibility 0.28s,
+                        max-height 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, opacity;
+            max-height: 520px;
+            overflow: hidden;
+        }
+
+        #left-spots-panel.is-collapsed {
+            transform: translateX(calc(-100% - 2rem)) !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+            height: 0 !important;
+            max-height: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            border-width: 0 !important;
+            margin: 0 !important;
+            overflow: hidden !important;
+        }
+
+        /* Floating expand button for left panel */
+        #btn-expand-left-panel {
+            transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                        visibility 0.2s;
+            will-change: transform, opacity;
+        }
+        #btn-expand-left-panel.btn-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateX(-12px) scale(0.95);
+        }
+        #btn-expand-left-panel.btn-visible {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateX(0) scale(1);
+        }
+    </style>
+    <script src="vendor/three.min.js" defer></script>
+    <script src="js/app.js?v=20261113L" defer></script>
+</head>
+<body class="bg-slate-950 text-slate-100 h-screen flex flex-col overflow-hidden">
+
+    <!-- ================= TOP BAR ================= -->
+    <header class="h-20 glass-panel z-30 px-3 sm:px-4 lg:px-6 flex items-center justify-between border-b border-emerald-500/30 shrink-0 gap-3 shadow-lg relative">
+        <!-- LEFT: Brand, Logo & Title -->
+        <div class="flex items-center gap-3 sm:gap-3.5 min-w-0">
+            <!-- Enlarged Official MOPH Emblem -->
+            <div class="moph-logo-badge relative rounded-full bg-white p-1 shadow-lg shadow-emerald-500/25 ring-2 ring-emerald-400/50 flex items-center justify-center shrink-0">
+                <img src="assets/logo MOPH.png" alt="ตรากระทรวงสาธารณสุข" class="w-full h-full object-contain rounded-full select-none pointer-events-none"
+                     onerror="this.onerror=null; this.src='assets/icon.svg';">
+            </div>
+            <div class="min-w-0 flex flex-col justify-center">
+                <div class="flex items-center gap-2">
+                    <span class="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 text-[10px] font-heading font-semibold px-2 py-0.5 rounded-full inline-flex items-center gap-1.5 shrink-0">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>3D DIGITAL TWIN
+                    </span>
+                    <span class="hidden md:inline-block text-[10px] font-heading text-slate-300 bg-slate-800/80 border border-slate-700 px-2 py-0.5 rounded-full">
+                        สสจ.มุกดาหาร
+                    </span>
+                </div>
+                <h1 class="text-sm sm:text-base lg:text-lg font-heading font-bold text-white tracking-wide leading-tight truncate mt-0.5">
+                    <span data-i18n="org">สำนักงานสาธารณสุขจังหวัดมุกดาหาร</span>
+                </h1>
+                <p class="text-[11px] text-slate-400 hidden xl:block leading-none mt-0.5">
+                    <span data-i18n="tagline">ระบบผังอาคาร 3 มิติ และค้นหากลุ่มงานอัจฉริยะ</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- RIGHT: Clean Grouped Controls -->
+        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+
+            <!-- Group 1: 3D View & Floor Picker (เลือกชั้นแบบย่อ + โหมดอาคาร) -->
+            <div class="flex items-center bg-slate-900/90 p-1 rounded-2xl border border-slate-700/80 gap-1 shadow-sm">
+                <!-- Compact Floor Selector Popover -->
+                <div class="relative" id="floor-picker-container">
+                    <button id="btn-floor-dropdown" type="button" onclick="toggleFloorDropdown()"
+                            class="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-heading font-semibold bg-slate-800 hover:bg-slate-750 text-white border border-slate-700 hover:border-emerald-500/60 shadow-sm flex items-center gap-1.5 sm:gap-2 transition cursor-pointer"
+                            title="เลือกชั้นอาคาร">
+                        <i class="fa-solid fa-layer-group text-emerald-400"></i>
+                        <span class="text-slate-400 font-normal hidden xl:inline" data-i18n="floor.pick">ชั้น:</span>
+                        <span id="current-floor-display" class="font-bold text-emerald-300 text-xs" data-i18n="floor.all">ทุกชั้น</span>
+                        <i id="floor-dropdown-chevron" class="fa-solid fa-chevron-down text-slate-400 text-[10px] transition-transform duration-200"></i>
+                    </button>
+
+                    <!-- Hidden select for backwards-compatibility -->
+                    <select id="mobile-floor-select" onchange="select3DFloor(this.value === 'ALL' ? 'ALL' : parseInt(this.value, 10))" class="sr-only" aria-label="Floor Select">
+                        <option value="ALL">ทุกชั้น</option>
+                        <option value="1">ชั้น 1</option>
+                        <option value="2">ชั้น 2</option>
+                        <option value="3">ชั้น 3</option>
+                        <option value="4">ชั้น 4</option>
+                    </select>
+
+                    <!-- Dropdown Popover Menu -->
+                    <div id="floor-dropdown-menu"
+                         class="hidden absolute top-full mt-2 right-0 w-56 bg-slate-900/95 backdrop-blur-xl border border-slate-700/90 rounded-2xl p-1.5 shadow-2xl z-50 flex flex-col gap-1">
+                        <div class="px-2.5 py-1 text-[11px] font-heading font-semibold text-slate-400 border-b border-slate-800 flex items-center justify-between">
+                            <span><i class="fa-solid fa-building mr-1.5 text-emerald-400"></i>เลือกชั้นอาคาร</span>
+                            <span class="text-[10px] text-slate-500 font-normal">4 ชั้น</span>
+                        </div>
+                        <button type="button" onclick="select3DFloor('ALL'); closeFloorDropdown();" id="btn-fl-ALL"
+                                class="fl-btn w-full px-2.5 py-1.5 rounded-xl text-xs font-heading font-semibold text-left flex items-center justify-between bg-emerald-600 text-white shadow transition cursor-pointer">
+                            <span class="flex items-center gap-2">
+                                <i class="fa-solid fa-layer-group text-xs text-emerald-200"></i>
+                                <span data-i18n="floor.all">ทุกชั้น</span>
+                            </span>
+                            <i class="fa-solid fa-check text-xs fl-check"></i>
+                        </button>
+                        <button type="button" onclick="select3DFloor(1); closeFloorDropdown();" id="btn-fl-1"
+                                class="fl-btn w-full px-2.5 py-1.5 rounded-xl text-xs font-heading font-semibold text-left flex items-center justify-between text-slate-300 hover:bg-slate-800 hover:text-white transition cursor-pointer">
+                            <span class="flex items-center gap-2">
+                                <span class="w-5 h-5 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-mono">1</span>
+                                <span data-i18n="floor.1">ชั้น 1</span>
+                            </span>
+                            <i class="fa-solid fa-check text-xs fl-check hidden"></i>
+                        </button>
+                        <button type="button" onclick="select3DFloor(2); closeFloorDropdown();" id="btn-fl-2"
+                                class="fl-btn w-full px-2.5 py-1.5 rounded-xl text-xs font-heading font-semibold text-left flex items-center justify-between text-slate-300 hover:bg-slate-800 hover:text-white transition cursor-pointer">
+                            <span class="flex items-center gap-2">
+                                <span class="w-5 h-5 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-mono">2</span>
+                                <span data-i18n="floor.2b">ชั้น 2 (ทางเชื่อม)</span>
+                            </span>
+                            <i class="fa-solid fa-check text-xs fl-check hidden"></i>
+                        </button>
+                        <button type="button" onclick="select3DFloor(3); closeFloorDropdown();" id="btn-fl-3"
+                                class="fl-btn w-full px-2.5 py-1.5 rounded-xl text-xs font-heading font-semibold text-left flex items-center justify-between text-slate-300 hover:bg-slate-800 hover:text-white transition cursor-pointer">
+                            <span class="flex items-center gap-2">
+                                <span class="w-5 h-5 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-mono">3</span>
+                                <span data-i18n="floor.3">ชั้น 3</span>
+                            </span>
+                            <i class="fa-solid fa-check text-xs fl-check hidden"></i>
+                        </button>
+                        <button type="button" onclick="select3DFloor(4); closeFloorDropdown();" id="btn-fl-4"
+                                class="fl-btn w-full px-2.5 py-1.5 rounded-xl text-xs font-heading font-semibold text-left flex items-center justify-between text-slate-300 hover:bg-slate-800 hover:text-white transition cursor-pointer">
+                            <span class="flex items-center gap-2">
+                                <span class="w-5 h-5 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-[10px] font-mono">4</span>
+                                <span data-i18n="floor.4">ชั้น 4</span>
+                            </span>
+                            <i class="fa-solid fa-check text-xs fl-check hidden"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3D Exterior / Interior Mode Switcher -->
+                <div class="hidden md:flex items-center bg-slate-950/60 p-0.5 rounded-xl border border-slate-800">
+                    <button onclick="setExteriorMode('realistic')" id="btn-ext-realistic" class="px-2 sm:px-2.5 py-1 rounded-lg text-xs font-heading font-semibold bg-emerald-600 text-white shadow flex items-center gap-1 transition cursor-pointer" title="นอกอาคารจริง">
+                        <i class="fa-solid fa-building"></i> <span class="hidden lg:inline" data-i18n="mode.exterior">นอกอาคาร</span>
+                    </button>
+                    <button onclick="setExteriorMode('hybrid')" id="btn-ext-hybrid" class="px-2 sm:px-2.5 py-1 rounded-lg text-xs font-heading font-semibold text-slate-300 hover:bg-slate-800 hover:text-white flex items-center gap-1 transition cursor-pointer" title="กึ่งโปร่งใส">
+                        <i class="fa-solid fa-eye"></i> <span class="hidden lg:inline" data-i18n="mode.hybrid">โปร่งใส</span>
+                    </button>
+                    <button onclick="setExteriorMode('interior')" id="btn-ext-interior" class="px-2 sm:px-2.5 py-1 rounded-lg text-xs font-heading font-semibold text-slate-300 hover:bg-slate-800 hover:text-white flex items-center gap-1 transition cursor-pointer" title="ผังห้องภายใน">
+                        <i class="fa-solid fa-cubes"></i> <span class="hidden lg:inline" data-i18n="mode.interior">ผังห้อง</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Group 2: Environment Buttons (ดาวเทียม, ท้องฟ้า) -->
+            <div class="hidden lg:flex items-center bg-slate-900/90 p-1 rounded-2xl border border-slate-700/80 gap-1 shadow-sm">
+                <!-- Satellite Ground Toggle -->
+                <button onclick="toggleSatelliteGround()" id="btn-satellite-toggle" type="button"
+                        class="px-2.5 py-1.5 rounded-xl text-xs font-heading font-semibold bg-emerald-600 hover:bg-emerald-500 border border-emerald-400 text-white shadow-sm flex items-center gap-1.5 transition cursor-pointer"
+                        title="เปิด/ปิด แผนที่ภาพถ่ายดาวเทียมจริง">
+                    <i class="fa-solid fa-satellite text-emerald-200"></i>
+                    <span class="hidden 2xl:inline">ดาวเทียม</span>
+                </button>
+
+                <!-- Sky Mode Button -->
+                <button onclick="toggleDaylightTheme()" id="btn-sky-mode" type="button"
+                        class="px-2.5 py-1.5 rounded-xl text-xs font-heading font-medium bg-sky-600/30 hover:bg-sky-600/50 border border-sky-400/40 text-sky-200 flex items-center gap-1.5 transition cursor-pointer"
+                        title="สลับโหมดท้องฟ้า (กลางวัน / กลางคืน)">
+                    <i class="fa-solid fa-cloud-sun text-amber-300"></i>
+                    <span class="hidden 2xl:inline" id="sky-mode-label">ท้องฟ้าจริง</span>
+                </button>
+            </div>
+
+            <!-- Group 3: Utility & Staff (เต็มจอ, ภาษา, หลังบ้าน) -->
+            <div class="flex items-center bg-slate-900/90 p-1 rounded-2xl border border-slate-700/80 gap-1 shadow-sm">
+                <!-- Fullscreen Button -->
+                <button onclick="toggleAppFullscreen()" id="btn-fullscreen" type="button"
+                        class="hidden sm:flex w-8 h-8 rounded-xl text-xs font-heading font-medium bg-slate-800/80 hover:bg-slate-700 border border-slate-600 text-slate-300 items-center justify-center transition cursor-pointer"
+                        title="เต็มจอ (Fullscreen)">
+                    <i class="fa-solid fa-expand"></i>
+                </button>
+
+                <!-- Language Button -->
+                <button id="btn-lang" type="button"
+                        class="w-9 h-8 rounded-xl text-xs font-heading font-bold bg-slate-800/80 hover:bg-slate-700 border border-slate-600 text-slate-200 flex items-center justify-center transition cursor-pointer"
+                        aria-label="Switch language / เปลี่ยนภาษา">EN</button>
+
+                <!-- Staff back-office (hidden in kiosk mode) -->
+                <a href="admin/" data-hide-in-kiosk
+                   class="hidden sm:flex px-2.5 py-1.5 rounded-xl text-xs font-heading font-semibold bg-emerald-950/80 hover:bg-emerald-900/90 text-emerald-300 border border-emerald-500/40 items-center gap-1.5 transition cursor-pointer"
+                   title="เข้าสู่ระบบเจ้าหน้าที่หลังบ้าน">
+                    <i class="fa-solid fa-user-gear"></i>
+                    <span class="hidden xl:inline" data-i18n="staff">เจ้าหน้าที่</span>
+                </a>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- ================= MAIN WORKSPACE ================= -->
+    <div class="flex-1 flex flex-col md:block relative overflow-hidden">
+
+        <!-- 3D WEBGL VIEWPORT (FULL-SCREEN BACKGROUND ON DESKTOP) -->
+        <div id="canvas-container" class="flex-1 md:absolute md:inset-0 md:w-full md:h-full relative min-h-0">
+            <div id="pins-container" class="absolute inset-0 pointer-events-none overflow-hidden z-10"></div>
+
+            <!-- Floating button to reopen sidebar when collapsed -->
+            <button id="btn-expand-sidebar" type="button" onclick="toggleSidebar(true)"
+                    class="hidden btn-hidden absolute top-3 right-3 z-30 bg-emerald-600 hover:bg-emerald-500 text-white font-heading font-semibold text-xs px-3.5 py-2 rounded-xl shadow-2xl flex items-center gap-2 border border-white/20 cursor-pointer"
+                    title="เปิดแถบข้อมูลห้องและค้นหา" data-i18n-title="sidebar.open">
+                <i class="fa-solid fa-angles-left"></i>
+                <span data-i18n="sidebar.open">เปิดข้อมูลห้อง & ค้นหา</span>
+            </button>
+
+            <!-- LEFT FLOATING OVERLAY: Executive Card + 8 Real Photo Spots -->
+            <div class="absolute top-3 left-3 z-20 hidden md:flex flex-col gap-2.5 w-72 sm:w-80 pointer-events-none">
+                <!-- Executive Card -->
+                <div id="executive-card" class="glass-panel rounded-2xl p-3 shadow-2xl pointer-events-auto border-l-4 border-l-emerald-500">
+                    <div class="flex items-center gap-3">
+                        <div class="relative w-14 h-16 rounded-xl overflow-hidden bg-gradient-to-b from-emerald-600/40 to-slate-900 border border-emerald-400/50 shrink-0 shadow-md">
+                            <img src="assets/dr-Narong3.png" alt="นพ.ณรงค์ จันทร์แก้ว" class="w-full h-full object-cover object-top"
+                                 onerror="this.onerror=null; this.src='assets/icon.svg';">
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <span class="inline-block text-[10px] font-heading font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                ผู้บริหารสูงสุด
+                            </span>
+                            <h2 class="text-sm font-heading font-bold text-white truncate mt-0.5">นพ.ณรงค์ จันทร์แก้ว</h2>
+                            <p class="text-[11px] text-emerald-300 truncate">นายแพทย์สาธารณสุขจังหวัดมุกดาหาร</p>
+                            <div class="mt-1.5 flex items-center gap-1.5">
+                                <button onclick="focusRoom3D('R431')" class="text-[11px] font-heading font-medium bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded-lg shadow flex items-center gap-1 transition">
+                                    <i class="fa-solid fa-location-crosshairs"></i> ห้องผู้บริหาร (ตึก 4F ชั้น 3)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Floating button to reopen left spots panel when collapsed -->
+                <button id="btn-expand-left-panel" type="button" onclick="toggleLeftPanel(true)"
+                        class="hidden btn-hidden bg-slate-900/95 hover:bg-slate-800 text-emerald-300 hover:text-white font-heading font-semibold text-xs px-3 py-2 rounded-xl shadow-2xl border border-emerald-500/40 cursor-pointer pointer-events-auto flex items-center gap-2 transition w-fit backdrop-blur-md"
+                        title="เปิดจุดเทียบภาพจริง & ทางเข้า-ออก">
+                    <i class="fa-solid fa-camera-retro text-amber-400"></i>
+                    <span>จุดเทียบภาพจริง 8 มุม</span>
+                    <i class="fa-solid fa-angles-right text-[10px] text-emerald-400"></i>
+                </button>
+
+                <!-- 8 Real Photo Spots Switcher (Collapsible to left) -->
+                <div id="left-spots-panel" class="glass-panel rounded-2xl p-2.5 shadow-2xl border border-emerald-500/30 pointer-events-auto">
+                    <div class="flex items-center justify-between text-[11px] font-heading font-semibold text-emerald-300 mb-1.5">
+                        <span><i class="fa-solid fa-camera-retro text-amber-400 mr-1"></i>จุดเทียบภาพจริง 8 มุม & ทางเข้า</span>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="focusBackExitRoute()" class="bg-lime-500 hover:bg-lime-400 text-slate-950 font-bold px-2 py-0.5 rounded text-[10px]" title="ดูเส้นทางประตูหลัง OSSC">
+                                <i class="fa-solid fa-torii-gate mr-0.5"></i>ประตูหลัง
+                            </button>
+                            <!-- Collapse left panel button -->
+                            <button type="button" onclick="toggleLeftPanel(false)" class="text-slate-400 hover:text-white px-1.5 py-0.5 rounded-lg hover:bg-slate-800 transition text-[11px] flex items-center gap-1 cursor-pointer" title="พับแถบเก็บเข้าด้านซ้าย">
+                                <i class="fa-solid fa-angles-left"></i>
+                                <span class="text-[10px]">พับ</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="minimap-body" class="space-y-2">
+                        <div class="grid grid-cols-2 gap-1.5 max-h-[190px] overflow-y-auto pr-0.5">
+                            <button onclick="inspectRealPhotoSpot(0)" class="group relative rounded-lg overflow-hidden border border-emerald-400/60 text-left bg-slate-900">
+                                <img src="assets/20854.jpg" alt="ตึก 4F เต็มตึก" class="w-full h-11 object-cover group-hover:scale-105 transition"
+                                     onerror="this.src='assets/icon.svg';">
+                                <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-emerald-200 truncate">
+                                    📸 1. ตึก 4F & ใต้ถุนรถตู้
+                                </div>
+                            </button>
+                            <button onclick="inspectRealPhotoSpot(1)" class="group relative rounded-lg overflow-hidden border border-sky-400/60 text-left bg-slate-900">
+                                <img src="assets/20863.jpg" alt="ป้าย OSSC & ประตูรั้ว" class="w-full h-11 object-cover group-hover:scale-105 transition"
+                                     onerror="this.src='assets/icon.svg';">
+                                <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-sky-200 truncate">
+                                    📸 2. ป้าย OSSC & ประตูรั้ว
+                                </div>
+                            </button>
+                            <button onclick="inspectRealPhotoSpot(2)" class="group relative rounded-lg overflow-hidden border border-amber-400/60 text-left bg-slate-900">
+                                <img src="assets/20855.jpg" alt="ซุ้ม OSSC & รั้วดื่มไม่ขับ" class="w-full h-11 object-cover group-hover:scale-105 transition"
+                                     onerror="this.src='assets/icon.svg';">
+                                <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-amber-200 truncate">
+                                    📸 3. ซุ้ม OSSC & ดื่มไม่ขับ
+                                </div>
+                            </button>
+                            <button onclick="inspectRealPhotoSpot(3)" class="group relative rounded-lg overflow-hidden border border-lime-400/60 text-left bg-slate-900">
+                                <img src="assets/20847.jpg" alt="ทางเชื่อมชั้น 2" class="w-full h-11 object-cover group-hover:scale-105 transition"
+                                     onerror="this.src='assets/icon.svg';">
+                                <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-lime-200 truncate">
+                                    📸 4. ทางเชื่อมชั้น 2 & ป้ายเลี้ยว
+                                </div>
+                            </button>
+                            <button onclick="inspectRealPhotoSpot(4)" class="group relative rounded-lg overflow-hidden border border-teal-400/60 text-left bg-slate-900">
+                                <img src="assets/20858.jpg" alt="เสาเขียวตึก 4F" class="w-full h-11 object-cover group-hover:scale-105 transition"
+                                     onerror="this.src='assets/icon.svg';">
+                                <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-teal-200 truncate">
+                                    📸 5. เสาเขียว 4F & ทางเดินกลาง
+                                </div>
+                            </button>
+                            <button onclick="inspectRealPhotoSpot(5)" class="group relative rounded-lg overflow-hidden border border-yellow-400/60 text-left bg-slate-900">
+                                <img src="assets/20846.jpg" alt="ทางออกหลัง & รวิญศิริ" class="w-full h-11 object-cover group-hover:scale-105 transition"
+                                     onerror="this.src='assets/icon.svg';">
+                                <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-yellow-200 truncate">
+                                    📸 6. ทางออกหลัง & รวิญศิริฯ
+                                </div>
+                            </button>
+                            <button onclick="inspectRealPhotoSpot(6)" class="group relative rounded-lg overflow-hidden border border-rose-400/60 text-left bg-slate-900">
+                                <img src="assets/20261109_163722.jpg" alt="หน้าต่าง 3 ช่อง & ประตูขาว" class="w-full h-11 object-cover group-hover:scale-105 transition"
+                                     onerror="this.src='assets/icon.svg';">
+                                <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-rose-200 truncate">
+                                    📸 7. หน้าต่าง 3 ช่อง & ประตูขาว
+                                </div>
+                            </button>
+                            <button onclick="inspectRealPhotoSpot(7)" class="group relative rounded-lg overflow-hidden border border-blue-400/60 text-left bg-slate-900">
+                                <img src="assets/20261109_163704.jpg" alt="คลินิกแพทย์แผนไทย" class="w-full h-11 object-cover group-hover:scale-105 transition"
+                                     onerror="this.src='assets/icon.svg';">
+                                <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-blue-200 truncate">
+                                    📸 8. คลินิกแพทย์แผนไทย
+                                </div>
+                            </button>
+                            <button onclick="inspectRealPhotoSpot(8)" class="group relative rounded-lg overflow-hidden border border-sky-400/60 text-left bg-slate-900">
+                                <img src="assets/f122.jpg" alt="โฉมหน้าตึก 1 & ซุ้มมุข" class="w-full h-11 object-cover group-hover:scale-105 transition"
+                                     onerror="this.src='assets/icon.svg';">
+                                <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-sky-200 truncate">
+                                    📸 9. ตึก 1 & ซุ้มมุข
+                                </div>
+                            </button>
+                            <button onclick="inspectRealPhotoSpot(9)" class="group relative rounded-lg overflow-hidden border border-amber-400/60 text-left bg-slate-900">
+                                <img src="assets/f12.jpg" alt="หอพระ & ลานจอดรถ" class="w-full h-11 object-cover group-hover:scale-105 transition"
+                                     onerror="this.src='assets/icon.svg';">
+                                <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-amber-200 truncate">
+                                    📸 10. หอพระ & ลานจอดรถ
+                                </div>
+                            </button>
+                            <button onclick="inspectRealPhotoSpot(10)" class="group relative rounded-lg overflow-hidden border border-cyan-400/60 text-left bg-slate-900">
+                                <img src="assets/f1.jpg" alt="ปีกอาคาร & ม้านั่งสวน" class="w-full h-11 object-cover group-hover:scale-105 transition"
+                                     onerror="this.src='assets/icon.svg';">
+                                <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-cyan-200 truncate">
+                                    📸 11. ปีกอาคาร & ม้านั่งสวน
+                                </div>
+                            </button>
+                        </div>
+
+                        <!-- Satellite Map Thumbnail (`4f ชั้น.jpg`) -->
+                        <div class="flex items-center justify-between bg-slate-900/90 p-1.5 rounded-xl border border-slate-700">
+                            <div class="flex items-center gap-2">
+                                <img src="assets/satellite-4f.jpg" alt="ผังดาวเทียม" class="w-9 h-9 rounded object-cover border border-emerald-500/40"
+                                     onerror="this.src='assets/icon.svg';">
+                                <div class="text-[10px] leading-tight">
+                                    <div class="font-heading font-semibold text-white">ผังภาพถ่ายดาวเทียม</div>
+                                    <div class="text-slate-400">ซ้อนพื้นแผนที่ 3D</div>
+                                </div>
+                            </div>
+                            <div class="flex gap-1">
+                                <button onclick="toggleSatelliteGround()" class="bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30 px-2 py-1 rounded text-[10px] font-heading">
+                                    พื้นแผนที่
+                                </button>
+                                <button onclick="setTopDownSatelliteView()" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 px-2 py-1 rounded text-[10px] font-heading">
+                                    มุมบน 90°
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Photo Comparison Floating Card -->
+            <div id="photo-compare-card" class="hidden absolute top-3 z-40 w-72 sm:w-80 glass-panel rounded-2xl p-3 border-2 border-amber-400/80 shadow-2xl" style="right: clamp(1rem, 25rem, calc(100vw - 22rem));">
+                <div class="flex items-center justify-between mb-1.5">
+                    <span id="photo-compare-title" class="text-xs font-heading font-bold text-amber-300 truncate">📸 ภาพสถานที่จริง</span>
+                    <button onclick="closePhotoCompareCard()" class="text-slate-400 hover:text-white text-xs px-1.5 py-0.5 rounded bg-slate-800">
+                        <i class="fa-solid fa-xmark"></i> ปิด
+                    </button>
+                </div>
+                <div class="rounded-xl overflow-hidden border border-slate-700 bg-slate-950 max-h-48 flex items-center justify-center">
+                    <img id="photo-compare-img" src="assets/20854.jpg" alt="ภาพถ่ายจริง" class="w-full h-44 object-cover">
+                </div>
+                <p id="photo-compare-desc" class="text-[11px] text-slate-300 mt-1.5 leading-snug"></p>
+            </div>
+
+            <!-- BOTTOM CENTER CONTROLS: Camera & Explode Slider -->
+            <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 w-[95%] max-w-2xl pointer-events-none">
+                <div class="glass-panel rounded-2xl px-2.5 md:px-3.5 py-2 md:py-2.5 shadow-2xl pointer-events-auto flex flex-wrap items-center justify-between gap-2">
+                    <div id="building-focus-buttons" class="flex items-center gap-1.5 flex-nowrap md:flex-wrap overflow-x-auto whitespace-nowrap max-w-full">
+                        <button onclick="focusBuilding3D('ALL')" class="bldg-btn bg-emerald-600 text-white text-xs font-heading font-semibold px-2.5 py-1.5 rounded-xl shadow">
+                            <i class="fa-solid fa-kaaba mr-1"></i><span data-i18n="bld.all">ภาพรวม</span>
+                        </button>
+                        <button onclick="focusBuilding3D('2F')" class="bldg-btn bg-slate-800 hover:bg-slate-700 text-sky-300 text-xs font-heading font-medium px-2.5 py-1.5 rounded-xl border border-sky-500/30" data-i18n="bld.2F">
+                            ตึกหน้า 2F (สีฟ้า)
+                        </button>
+                        <button onclick="focusBuilding3D('4F')" class="bldg-btn bg-slate-800 hover:bg-slate-700 text-emerald-300 text-xs font-heading font-medium px-2.5 py-1.5 rounded-xl border border-emerald-500/30" data-i18n="bld.4F">
+                            ตึกหลัง 4F (สีขาว-เขียว)
+                        </button>
+                        <button onclick="focusSkybridge3D()" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-heading font-medium px-2.5 py-1.5 rounded-xl border border-amber-500/40">
+                            <i class="fa-solid fa-bridge mr-1"></i><span data-i18n="bld.bridge">ทางเชื่อมชั้น 2</span>
+                        </button>
+                        <button onclick="focusBuilding3D('TTM')" class="bldg-btn bg-slate-800 hover:bg-slate-700 text-blue-300 text-xs font-heading font-medium px-2.5 py-1.5 rounded-xl border border-blue-500/30" data-i18n="bld.TTM">
+                            แพทย์แผนไทย
+                        </button>
+                    </div>
+
+                    <div class="flex items-center gap-2 ml-auto">
+                        <span class="text-[11px] font-heading text-slate-300 whitespace-nowrap">
+                            <i class="fa-solid fa-arrows-up-down text-amber-400 mr-1"></i><span data-i18n="explode">แยกชั้น:</span>
+                        </span>
+                        <input id="explode-slider" type="range" min="0" max="100" value="0"
+                               oninput="handleExplodeSlider(this.value)"
+                               class="w-20 sm:w-24 accent-emerald-500 cursor-pointer h-1.5 bg-slate-700 rounded-lg">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT FLOATING OVERLAY SIDEBAR: Directory & Selected Room Inspector -->
+        <aside id="sidebar-panel" class="w-full h-[45%] md:h-auto md:w-80 lg:w-96 shrink-0 md:shrink flex flex-col z-30">
+            <div class="sidebar-content-wrapper flex flex-col h-full min-h-0 overflow-hidden">
+                <!-- Sidebar Top Bar with Collapse Button -->
+                <div class="px-4 py-2.5 bg-slate-900/90 border-b border-slate-800/80 flex items-center justify-between shrink-0 rounded-t-2xl">
+                    <span class="text-xs font-heading font-semibold text-emerald-400 flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-info"></i> <span data-i18n="sidebar.title">ข้อมูลห้อง & บริการ</span>
+                    </span>
+                    <button type="button" onclick="toggleSidebar(false)" id="btn-collapse-sidebar"
+                            class="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-2.5 py-1 rounded-xl border border-slate-700 text-xs font-heading flex items-center gap-1.5 transition cursor-pointer shadow-sm"
+                            title="พับปิดแถบข้าง เพื่อดูผัง 3D เต็มจอ" data-i18n-title="sidebar.close">
+                        <span data-i18n="sidebar.close">พับแถบข้าง</span>
+                        <i class="fa-solid fa-angles-right hidden md:inline"></i>
+                        <i class="fa-solid fa-chevron-down md:hidden"></i>
+                    </button>
+                </div>
+
+                <!-- Selected Room Detail Card -->
+                <div id="room-detail-panel" class="p-3.5 border-b border-slate-800 bg-slate-900/60 shrink-0">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span id="detail-badge" class="text-[10px] font-heading font-semibold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            ตึกหลัง 4F • ชั้น 3 • ห้อง 431
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <span id="detail-phone" class="text-xs text-amber-300 font-heading font-semibold">
+                                <i class="fa-solid fa-phone-volume mr-1"></i>ต่อ 301
+                            </span>
+                            <!-- Button to fold/collapse the room detail body -->
+                            <button type="button" onclick="toggleRoomDetailBody()" id="btn-toggle-room-detail"
+                                    class="bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white px-2 py-0.5 rounded-md border border-slate-700/60 text-[11px] font-heading flex items-center gap-1 transition cursor-pointer"
+                                    title="ย่อหรือขยายรายละเอียดห้อง" data-i18n-title="room.toggle">
+                                <span id="text-toggle-room-detail">ย่อ</span>
+                                <i id="icon-toggle-room-detail" class="fa-solid fa-chevron-up text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="room-detail-body" class="room-detail-accordion">
+                        <div class="room-detail-inner space-y-2 pt-1">
+                            <h3 id="detail-title" class="text-base font-heading font-bold text-white leading-snug">
+                                ห้องทำงานนายแพทย์สาธารณสุขจังหวัดมุกดาหาร
+                            </h3>
+                            <p id="detail-head" class="text-xs text-emerald-400 font-medium mt-0.5">
+                                นพ.ณรงค์ จันทร์แก้ว (นพ.สสจ.มุกดาหาร)
+                            </p>
+                            <p id="detail-booking" class="hidden" aria-live="polite"></p>
+                            <p id="detail-desc" class="text-xs text-slate-300 mt-1.5 leading-relaxed">
+                                ห้องปฏิบัติราชการผู้บริหารสูงสุด สำนักงานสาธารณสุขจังหวัดมุกดาหาร สามารถเดินจากตึกหน้า 2 ชั้น ผ่านสะพานทางเชื่อมชั้น 2 แล้วขึ้นชั้น 3 ได้ทันที
+                            </p>
+
+                            <div class="mt-3">
+                                <button onclick="setExteriorMode('interior')" class="w-full bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 border border-emerald-500/40 font-heading font-semibold text-xs py-2 px-3 rounded-xl transition flex items-center justify-center gap-2 shadow-sm" title="เปิดดูผังห้องภายใน">
+                                    <i class="fa-solid fa-cubes"></i> <span>ดูผังห้องภายใน (Floor Plan)</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search & Building Filter -->
+                <div class="p-3 border-b border-slate-800 space-y-2 shrink-0">
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input id="dir-search" type="text" oninput="renderDirectoryList()"
+                               placeholder="ค้นหากลุ่มงาน, ชื่อห้อง, เบอร์ต่อ, OSSC..." data-i18n-placeholder="search.ph" aria-label="ค้นหา"
+                               class="w-full bg-slate-900/90 border border-slate-700 focus:border-emerald-500 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-400 outline-none">
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] text-slate-400 font-heading">
+                        <span data-i18n="dir.title">รายการกลุ่มงาน/จุดบริการทั้งหมด</span>
+                        <span id="dir-count-badge" class="text-emerald-400 font-semibold">19 หน่วยงาน</span>
+                    </div>
+                </div>
+
+                <!-- Scrollable Room Directory List -->
+                <div id="directory-list" class="flex-1 overflow-y-auto p-2.5 space-y-1.5 min-h-0 rounded-b-2xl"></div>
+            </div>
+        </aside>
+    </div>
+
+</body>
+</html>

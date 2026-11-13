@@ -1,0 +1,14 @@
+{
+  "name": "ผังอาคาร 3 มิติ สสจ.มุกดาหาร",
+  "short_name": "ผังอาคาร สสจ.มห",
+  "description": "ผังอาคาร 3 มิติ ค้นหากลุ่มงาน และนำทาง สำนักงานสาธารณสุขจังหวัดมุกดาหาร",
+  "lang": "th",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

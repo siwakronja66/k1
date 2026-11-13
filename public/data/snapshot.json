@@ -1,0 +1,1170 @@
+{
+  "version": 20,
+  "buildings": [
+    {
+      "id": "2F",
+      "name": "อาคาร 1 (ตึกหน้า 2 ชั้น สีฟ้า)",
+      "nameEn": "Building 1 (2-storey front, blue)",
+      "shortName": "ตึกหน้า 2 ชั้น (2F)",
+      "shortNameEn": "Front building (2F)",
+      "floors": 2,
+      "width": 24,
+      "depth": 9.5,
+      "centerX": -1.5,
+      "centerZ": 8.5,
+      "rotY": 0,
+      "color": "#0284c7"
+    },
+    {
+      "id": "4F",
+      "name": "อาคาร 2 (ตึกหลัง 4 ชั้น สีขาว-เขียว & OSSC)",
+      "nameEn": "Building 2 (4-storey rear, white-green)",
+      "shortName": "ตึกหลัง 4 ชั้น (4F)",
+      "shortNameEn": "Rear building (4F)",
+      "floors": 4,
+      "width": 26,
+      "depth": 10.5,
+      "centerX": -3.2,
+      "centerZ": -8.2,
+      "rotY": 0,
+      "color": "#10b981"
+    },
+    {
+      "id": "TTM",
+      "name": "คลินิกบริการแพทย์แผนไทย @ สสจ.มุกดาหาร",
+      "nameEn": "Thai Traditional Medicine Clinic",
+      "shortName": "คลินิกแพทย์แผนไทย",
+      "shortNameEn": "Thai Medicine Clinic",
+      "floors": 1,
+      "width": 11,
+      "depth": 6.5,
+      "centerX": 19.2,
+      "centerZ": -13.5,
+      "rotY": -0.32,
+      "color": "#2563eb"
+    }
+  ],
+  "rooms": [
+    {
+      "id": "R211",
+      "building": "2F",
+      "floor": 1,
+      "roomNo": "211",
+      "name": "จุดประชาสัมพันธ์ & รับ-ส่งหนังสือราชการ",
+      "head": "งานสารบรรณกลาง",
+      "phone": "ต่อ 101",
+      "type": "service",
+      "desc": "จุดสอบถามข้อมูลผู้มาติดต่อราชการ รับเรื่องร้องเรียน และงานสารบรรณกลาง ตึกหน้าชั้น 1",
+      "nameEn": "Information desk & Central correspondence",
+      "descEn": "",
+      "lx": -7.5,
+      "lz": 0,
+      "w": 6.8,
+      "d": 6.8
+    },
+    {
+      "id": "R212",
+      "building": "2F",
+      "floor": 1,
+      "roomNo": "212",
+      "name": "กลุ่มงานบริหารทั่วไป (การเงินและบัญชี)",
+      "head": "หัวหน้ากลุ่มงานบริหารทั่วไป",
+      "phone": "ต่อ 102",
+      "type": "admin",
+      "desc": "งานการเงิน การบัญชี เบิกจ่ายงบประมาณ และค่าตอบแทนบุคลากร",
+      "nameEn": "General Administration (Finance & Accounting)",
+      "descEn": "",
+      "lx": 0,
+      "lz": 0,
+      "w": 6.8,
+      "d": 6.8
+    },
+    {
+      "id": "R213",
+      "building": "2F",
+      "floor": 1,
+      "roomNo": "213",
+      "name": "งานพัสดุและบริหารสินทรัพย์",
+      "head": "งานพัสดุกลาง",
+      "phone": "ต่อ 103",
+      "type": "admin",
+      "desc": "งานจัดซื้อจัดจ้าง ครุภัณฑ์ และดูแลอาคารสถานที่",
+      "nameEn": "Procurement & Asset Management",
+      "descEn": "",
+      "lx": 7.5,
+      "lz": 0,
+      "w": 6.8,
+      "d": 6.8
+    },
+    {
+      "id": "R221",
+      "building": "2F",
+      "floor": 2,
+      "roomNo": "221",
+      "name": "กลุ่มงานสุขศึกษาและประชาสัมพันธ์",
+      "head": "หัวหน้ากลุ่มงานสุขศึกษาฯ",
+      "phone": "ต่อ 121",
+      "type": "academic",
+      "desc": "สื่อสารประชาสัมพันธ์ข้อมูลข่าวสารสุขภาพ และงานมวลชนสัมพันธ์",
+      "nameEn": "Health Education & Public Relations",
+      "descEn": "",
+      "lx": -7.5,
+      "lz": 0,
+      "w": 6.8,
+      "d": 6.8
+    },
+    {
+      "id": "R222",
+      "building": "2F",
+      "floor": 2,
+      "roomNo": "222",
+      "name": "กลุ่มงานนิติการ (กฎหมายสาธารณสุข)",
+      "head": "นิติกรชำนาญการ",
+      "phone": "ต่อ 122",
+      "type": "admin",
+      "desc": "งานกฎหมายสาธารณสุข คำสั่งทางปกครอง และโถงทางเชื่อมไปตึก 4 ชั้น",
+      "nameEn": "Legal Affairs (Public Health Law)",
+      "descEn": "",
+      "lx": 0,
+      "lz": 0,
+      "w": 6.8,
+      "d": 6.8
+    },
+    {
+      "id": "R223",
+      "building": "2F",
+      "floor": 2,
+      "roomNo": "223",
+      "name": "ห้องประชุม TO BE NUMBER ONE & ตรวจสอบภายใน",
+      "head": "ศูนย์เพื่อนใจ TO BE NUMBER ONE",
+      "phone": "ต่อ 123",
+      "type": "meeting",
+      "desc": "ห้องประชุมโครงการทูบีนัมเบอร์วัน และหน่วยตรวจสอบภายใน",
+      "nameEn": "TO BE NUMBER ONE Meeting Room & Internal Audit",
+      "descEn": "",
+      "lx": 7.5,
+      "lz": 0,
+      "w": 6.8,
+      "d": 6.8
+    },
+    {
+      "id": "R412",
+      "building": "4F",
+      "floor": 1,
+      "roomNo": "412",
+      "name": "กลุ่มงานประกันสุขภาพ & ทันตสาธารณสุข",
+      "head": "หัวหน้ากลุ่มงานประกันสุขภาพ",
+      "phone": "ต่อ 202",
+      "type": "service",
+      "desc": "งานสิทธิหลักประกันสุขภาพแห่งชาติ (บัตรทอง 30 บาท) และงานทันตสาธารณสุข (ประตูบานเกล็ดขาวข้างบันไดไม้)",
+      "nameEn": "Health Insurance & Dental Public Health",
+      "descEn": "",
+      "lx": 2.6,
+      "lz": 0.7,
+      "w": 4.5,
+      "d": 6.2
+    },
+    {
+      "id": "R411",
+      "building": "4F",
+      "floor": 1,
+      "roomNo": "OSSC-1",
+      "name": "ศูนย์บริการผลิตภัณฑ์สุขภาพเบ็ดเสร็จ (OSSC สสจ.มห)",
+      "head": "กลุ่มงานคุ้มครองผู้บริโภคและเภสัชสาธารณสุข",
+      "phone": "ต่อ 201",
+      "type": "service",
+      "desc": "One Stop Service Center ขออนุญาตผลิตภัณฑ์สุขภาพ อย. ร้านยา คลินิก สถานประกอบการเพื่อสุขภาพ (มีประตูทางเข้าด้านหลังพร้อมกันสาดขาว)",
+      "nameEn": "One Stop Service Center (Health Products, OSSC)",
+      "descEn": "",
+      "lx": 9.2,
+      "lz": -1.2,
+      "w": 5.8,
+      "d": 6.2
+    },
+    {
+      "id": "R421",
+      "building": "4F",
+      "floor": 2,
+      "roomNo": "421",
+      "name": "กลุ่มงานส่งเสริมสุขภาพ (แม่และเด็ก/ผู้สูงอายุ)",
+      "head": "หัวหน้ากลุ่มงานส่งเสริมสุขภาพ",
+      "phone": "ต่อ 221",
+      "type": "academic",
+      "desc": "งานอนามัยแม่และเด็ก วัยเรียน วัยทำงาน และคลินิกผู้สูงอายุ (ติดโถงทางเชื่อมชั้น 2)",
+      "nameEn": "Health Promotion (Maternal-Child / Elderly)",
+      "descEn": "",
+      "lx": -7.5,
+      "lz": 0,
+      "w": 7.2,
+      "d": 7.2
+    },
+    {
+      "id": "R422",
+      "building": "4F",
+      "floor": 2,
+      "roomNo": "422",
+      "name": "กลุ่มงานควบคุมโรคติดต่อ & ระบาดวิทยา",
+      "head": "หัวหน้ากลุ่มงานควบคุมโรคติดต่อ",
+      "phone": "ต่อ 222",
+      "type": "academic",
+      "desc": "เฝ้าระวังป้องกันและควบคุมโรคติดต่อ โรคอุบัติใหม่ และงานระบาดวิทยา",
+      "nameEn": "Communicable Disease Control & Epidemiology",
+      "descEn": "",
+      "lx": 0.1,
+      "lz": -0.9,
+      "w": 7.2,
+      "d": 7.2
+    },
+    {
+      "id": "R423",
+      "building": "4F",
+      "floor": 2,
+      "roomNo": "423",
+      "name": "กลุ่มงานควบคุมโรคไม่ติดต่อ สุขภาพจิตและยาเสพติด (NCDs)",
+      "head": "หัวหน้ากลุ่มงาน NCDs",
+      "phone": "ต่อ 223",
+      "type": "academic",
+      "desc": "งานป้องกันควบคุมโรคเบาหวาน ความดันโลหิตสูง สุขภาพจิต และบำบัดยาเสพติด",
+      "nameEn": "NCDs, Mental Health & Substance Abuse",
+      "descEn": "",
+      "lx": 8.2,
+      "lz": 0,
+      "w": 6.8,
+      "d": 7.2
+    },
+    {
+      "id": "R431",
+      "building": "4F",
+      "floor": 3,
+      "roomNo": "431",
+      "name": "ห้องทำงานนายแพทย์สาธารณสุขจังหวัดมุกดาหาร",
+      "head": "นพ.ณรงค์ จันทร์แก้ว (นพ.สสจ.มุกดาหาร)",
+      "phone": "ต่อ 301",
+      "type": "executive",
+      "desc": "ห้องปฏิบัติราชการ นายแพทย์สาธารณสุขจังหวัดมุกดาหาร",
+      "nameEn": "Office of the Provincial Chief Medical Officer",
+      "descEn": "",
+      "lx": -8,
+      "lz": 0,
+      "w": 6.5,
+      "d": 7.2
+    },
+    {
+      "id": "R432",
+      "building": "4F",
+      "floor": 3,
+      "roomNo": "432",
+      "name": "สำนักงานเลขานุการผู้บริหาร & ห้องรอง นพ.สสจ.",
+      "head": "หัวหน้าสำนักงานเลขานุการ",
+      "phone": "ต่อ 302",
+      "type": "executive",
+      "desc": "หน้าห้องผู้บริหาร ประสานงานวาระผู้บริหาร และห้องทำงานรองนายแพทย์สาธารณสุขจังหวัด",
+      "nameEn": "Executive Secretariat & Deputy Chief Medical Officers",
+      "descEn": "",
+      "lx": -1,
+      "lz": 0,
+      "w": 6.2,
+      "d": 7.2
+    },
+    {
+      "id": "R433",
+      "building": "4F",
+      "floor": 3,
+      "roomNo": "433",
+      "name": "กลุ่มงานพัฒนายุทธศาสตร์ & ทรัพยากรบุคคล (HR)",
+      "head": "หัวหน้ากลุ่มงานพัฒนายุทธศาสตร์ฯ",
+      "phone": "ต่อ 303",
+      "type": "admin",
+      "desc": "งานแผนงานยุทธศาสตร์สาธารณสุขจังหวัด และการบริหารงานบุคคล (HR)",
+      "nameEn": "Strategy Development & Human Resources",
+      "descEn": "",
+      "lx": 5.5,
+      "lz": 0,
+      "w": 5.5,
+      "d": 7.2
+    },
+    {
+      "id": "R434",
+      "building": "4F",
+      "floor": 3,
+      "roomNo": "434",
+      "name": "กลุ่มงานพัฒนาคุณภาพและรูปแบบบริการ (พรส.)",
+      "head": "หัวหน้ากลุ่มงาน พรส.",
+      "phone": "ต่อ 304",
+      "type": "academic",
+      "desc": "งานพัฒนาคุณภาพบริการ รพ.สต. และมาตรฐานระบบบริการสุขภาพ",
+      "nameEn": "Service Quality Development",
+      "descEn": "",
+      "lx": 10.5,
+      "lz": 0,
+      "w": 3.8,
+      "d": 7.2
+    },
+    {
+      "id": "R441",
+      "building": "4F",
+      "floor": 4,
+      "roomNo": "441",
+      "name": "กลุ่มงานสุขภาพดิจิทัล",
+      "head": "หัวหน้ากลุ่มงานสุขภาพดิจิทัล",
+      "phone": "ต่อ 401",
+      "type": "digital",
+      "desc": "งานระบบสารสนเทศและข้อมูลสุขภาพ (HDC) ให้คำปรึกษาด้านเทคโนโลยีสารสนเทศแก่หน่วยบริการ",
+      "nameEn": "Digital Health",
+      "descEn": "",
+      "lx": -8.6,
+      "lz": -3.1,
+      "w": 7.4,
+      "d": 3.1
+    },
+    {
+      "id": "R442",
+      "building": "4F",
+      "floor": 4,
+      "roomNo": "442",
+      "name": "กลุ่มงานอนามัยสิ่งแวดล้อมและอาชีวอนามัย",
+      "head": "หัวหน้ากลุ่มงานอนามัยสิ่งแวดล้อมฯ",
+      "phone": "ต่อ 402",
+      "type": "academic",
+      "desc": "งานสุขาภิบาลอาหารและน้ำ ขยะติดเชื้อ และอาชีวอนามัย",
+      "nameEn": "Environmental & Occupational Health",
+      "descEn": "",
+      "lx": -7.7,
+      "lz": 3,
+      "w": 9.3,
+      "d": 3.3
+    },
+    {
+      "id": "R443",
+      "building": "4F",
+      "floor": 4,
+      "roomNo": "443",
+      "name": "ห้องประชุมใหญ่ ชั้น 4 (ห้องประชุมพญามุกดาหาร)",
+      "head": "ความจุ 150 ที่นั่ง",
+      "phone": "ต่อ 403",
+      "type": "meeting",
+      "desc": "ห้องประชุมใหญ่ประจำสำนักงานสาธารณสุขจังหวัดมุกดาหาร พร้อมระบบ Video Conference",
+      "nameEn": "Main Meeting Room, 4th floor",
+      "descEn": "",
+      "lx": 8.6,
+      "lz": 0,
+      "w": 8.1,
+      "d": 9.8
+    },
+    {
+      "id": "RTTM1",
+      "building": "TTM",
+      "floor": 1,
+      "roomNo": "TTM-1",
+      "name": "คลินิกบริการแพทย์แผนไทย @ สสจ.มุกดาหาร",
+      "head": "กลุ่มงานการแพทย์แผนไทยและการแพทย์ทางเลือก",
+      "phone": "ต่อ 501",
+      "type": "service",
+      "desc": "บริการตรวจรักษา นวดเพื่อสุขภาพ ประคบสมุนไพร อบไอน้ำสมุนไพร และจ่ายยาสมุนไพร (ติดทางออกด้านหลัง ถนนชาภูบาล)",
+      "nameEn": "Thai Traditional Medicine Clinic",
+      "descEn": "",
+      "lx": 0,
+      "lz": 0,
+      "w": 9.2,
+      "d": 5
+    }
+  ],
+  "services": [
+    {
+      "keyword": "ขยะติดเชื้อ / สุขาภิบาลอาหาร",
+      "roomId": "R442"
+    },
+    {
+      "keyword": "ขออนุญาตผลิตภัณฑ์สุขภาพ / อย.",
+      "roomId": "R411"
+    },
+    {
+      "keyword": "ขออนุญาตเปิดคลินิก",
+      "roomId": "R411"
+    },
+    {
+      "keyword": "จัดซื้อจัดจ้าง / พัสดุ",
+      "roomId": "R213"
+    },
+    {
+      "keyword": "ต่อใบอนุญาตร้านยา",
+      "roomId": "R411"
+    },
+    {
+      "keyword": "ทำฟัน / ทันตสาธารณสุข",
+      "roomId": "R412"
+    },
+    {
+      "keyword": "นวดแผนไทย / สมุนไพร",
+      "roomId": "RTTM1"
+    },
+    {
+      "keyword": "บัตรทอง / สิทธิ 30 บาท",
+      "roomId": "R412"
+    },
+    {
+      "keyword": "ประชุม / ห้องประชุมใหญ่",
+      "roomId": "R443"
+    },
+    {
+      "keyword": "พบนายแพทย์สาธารณสุขจังหวัด",
+      "roomId": "R432"
+    },
+    {
+      "keyword": "ร้องเรียนผลิตภัณฑ์ / โฆษณา",
+      "roomId": "R411"
+    },
+    {
+      "keyword": "วัคซีน / โรคระบาด",
+      "roomId": "R422"
+    },
+    {
+      "keyword": "ส่งหนังสือราชการ",
+      "roomId": "R211"
+    },
+    {
+      "keyword": "สถานประกอบการเพื่อสุขภาพ / สปา / นวด",
+      "roomId": "R411"
+    },
+    {
+      "keyword": "สมัครงาน / บุคลากร HR",
+      "roomId": "R433"
+    },
+    {
+      "keyword": "สอบถามข้อมูลทั่วไป / ร้องเรียน",
+      "roomId": "R211"
+    },
+    {
+      "keyword": "เบาหวาน ความดัน / สุขภาพจิต / ยาเสพติด",
+      "roomId": "R423"
+    },
+    {
+      "keyword": "เบิกจ่าย / การเงิน",
+      "roomId": "R212"
+    },
+    {
+      "keyword": "แม่และเด็ก / ผู้สูงอายุ",
+      "roomId": "R421"
+    }
+  ],
+  "nav": {
+    "nodes": [
+      {
+        "id": "b2_f1_c",
+        "buildingId": "2F",
+        "floor": 1,
+        "x": -2.2,
+        "y": 0.6,
+        "z": 12.6,
+        "kind": "corridor",
+        "label": "ตึกหน้า ชั้น 1 ทางเดินกลาง",
+        "labelEn": ""
+      },
+      {
+        "id": "b2_f1_e",
+        "buildingId": "2F",
+        "floor": 1,
+        "x": 7.5,
+        "y": 0.6,
+        "z": 12.6,
+        "kind": "corridor",
+        "label": "ตึกหน้า ชั้น 1 ทางเดินฝั่งตะวันออก",
+        "labelEn": ""
+      },
+      {
+        "id": "b2_f1_n",
+        "buildingId": "2F",
+        "floor": 1,
+        "x": -2.2,
+        "y": 0.6,
+        "z": 4.3,
+        "kind": "entrance",
+        "label": "ประตูหลังตึกหน้า (ลานกลาง)",
+        "labelEn": "the back door of the front building"
+      },
+      {
+        "id": "b2_f1_s",
+        "buildingId": "2F",
+        "floor": 1,
+        "x": -12.6,
+        "y": 0.6,
+        "z": 12.6,
+        "kind": "stair",
+        "label": "บันไดตึกหน้า ชั้น 1",
+        "labelEn": ""
+      },
+      {
+        "id": "b2_f1_w",
+        "buildingId": "2F",
+        "floor": 1,
+        "x": -8.5,
+        "y": 0.6,
+        "z": 12.6,
+        "kind": "corridor",
+        "label": "ตึกหน้า ชั้น 1 ทางเดินฝั่งตะวันตก",
+        "labelEn": ""
+      },
+      {
+        "id": "b2_f2_c",
+        "buildingId": "2F",
+        "floor": 2,
+        "x": -2.2,
+        "y": 4.2,
+        "z": 12.6,
+        "kind": "corridor",
+        "label": "ตึกหน้า ชั้น 2 ทางเดินกลาง",
+        "labelEn": ""
+      },
+      {
+        "id": "b2_f2_e",
+        "buildingId": "2F",
+        "floor": 2,
+        "x": 7.5,
+        "y": 4.2,
+        "z": 12.6,
+        "kind": "corridor",
+        "label": "ตึกหน้า ชั้น 2 ทางเดินฝั่งตะวันออก",
+        "labelEn": ""
+      },
+      {
+        "id": "b2_f2_s",
+        "buildingId": "2F",
+        "floor": 2,
+        "x": -12.6,
+        "y": 4.2,
+        "z": 12.6,
+        "kind": "stair",
+        "label": "บันไดตึกหน้า ชั้น 2",
+        "labelEn": ""
+      },
+      {
+        "id": "b2_f2_w",
+        "buildingId": "2F",
+        "floor": 2,
+        "x": -8.5,
+        "y": 4.2,
+        "z": 12.6,
+        "kind": "corridor",
+        "label": "ตึกหน้า ชั้น 2 ทางเดินฝั่งตะวันตก",
+        "labelEn": ""
+      },
+      {
+        "id": "b4_f1_bk",
+        "buildingId": "4F",
+        "floor": 1,
+        "x": 6,
+        "y": 0.6,
+        "z": -14,
+        "kind": "entrance",
+        "label": "ประตูหลัง OSSC (กันสาดขาว)",
+        "labelEn": "the OSSC back door (white canopy)"
+      },
+      {
+        "id": "b4_f1_c",
+        "buildingId": "4F",
+        "floor": 1,
+        "x": -2.2,
+        "y": 0.6,
+        "z": -3.6,
+        "kind": "corridor",
+        "label": "ตึกหลัง ชั้น 1 กลาง",
+        "labelEn": ""
+      },
+      {
+        "id": "b4_f1_e",
+        "buildingId": "4F",
+        "floor": 1,
+        "x": 6.5,
+        "y": 0.6,
+        "z": -3.6,
+        "kind": "corridor",
+        "label": "ตึกหลัง ชั้น 1 ฝั่งตะวันออก",
+        "labelEn": ""
+      },
+      {
+        "id": "b4_f1_s",
+        "buildingId": "4F",
+        "floor": 1,
+        "x": -14.5,
+        "y": 0.6,
+        "z": -3.6,
+        "kind": "stair",
+        "label": "บันไดตึกหลัง ชั้น 1",
+        "labelEn": ""
+      },
+      {
+        "id": "b4_f1_w",
+        "buildingId": "4F",
+        "floor": 1,
+        "x": -10,
+        "y": 0.6,
+        "z": -3.6,
+        "kind": "corridor",
+        "label": "ตึกหลัง ชั้น 1 ฝั่งตะวันตก (ใต้ถุน)",
+        "labelEn": ""
+      },
+      {
+        "id": "b4_f2_c",
+        "buildingId": "4F",
+        "floor": 2,
+        "x": -2.2,
+        "y": 4.2,
+        "z": -3.6,
+        "kind": "corridor",
+        "label": "ตึกหลัง ชั้น 2 กลาง",
+        "labelEn": ""
+      },
+      {
+        "id": "b4_f2_e",
+        "buildingId": "4F",
+        "floor": 2,
+        "x": 6.5,
+        "y": 4.2,
+        "z": -3.6,
+        "kind": "corridor",
+        "label": "ตึกหลัง ชั้น 2 ฝั่งตะวันออก",
+        "labelEn": ""
+      },
+      {
+        "id": "b4_f2_s",
+        "buildingId": "4F",
+        "floor": 2,
+        "x": -14.5,
+        "y": 4.2,
+        "z": -3.6,
+        "kind": "stair",
+        "label": "บันไดตึกหลัง ชั้น 2",
+        "labelEn": ""
+      },
+      {
+        "id": "b4_f2_w",
+        "buildingId": "4F",
+        "floor": 2,
+        "x": -10,
+        "y": 4.2,
+        "z": -3.6,
+        "kind": "corridor",
+        "label": "ตึกหลัง ชั้น 2 ฝั่งตะวันตก",
+        "labelEn": ""
+      },
+      {
+        "id": "b4_f3_c",
+        "buildingId": "4F",
+        "floor": 3,
+        "x": -2.2,
+        "y": 7.8,
+        "z": -3.6,
+        "kind": "corridor",
+        "label": "ตึกหลัง ชั้น 3 กลาง",
+        "labelEn": ""
+      },
+      {
+        "id": "b4_f3_e",
+        "buildingId": "4F",
+        "floor": 3,
+        "x": 6.5,
+        "y": 7.8,
+        "z": -3.6,
+        "kind": "corridor",
+        "label": "ตึกหลัง ชั้น 3 ฝั่งตะวันออก",
+        "labelEn": ""
+      },
+      {
+        "id": "b4_f3_s",
+        "buildingId": "4F",
+        "floor": 3,
+        "x": -14.5,
+        "y": 7.8,
+        "z": -3.6,
+        "kind": "stair",
+        "label": "บันไดตึกหลัง ชั้น 3",
+        "labelEn": ""
+      },
+      {
+        "id": "b4_f3_w",
+        "buildingId": "4F",
+        "floor": 3,
+        "x": -10,
+        "y": 7.8,
+        "z": -3.6,
+        "kind": "corridor",
+        "label": "ตึกหลัง ชั้น 3 ฝั่งตะวันตก",
+        "labelEn": ""
+      },
+      {
+        "id": "b4_f4_c",
+        "buildingId": "4F",
+        "floor": 4,
+        "x": -2.2,
+        "y": 11.4,
+        "z": -3.6,
+        "kind": "corridor",
+        "label": "ตึกหลัง ชั้น 4 กลาง",
+        "labelEn": ""
+      },
+      {
+        "id": "b4_f4_e",
+        "buildingId": "4F",
+        "floor": 4,
+        "x": 6.5,
+        "y": 11.4,
+        "z": -3.6,
+        "kind": "corridor",
+        "label": "ตึกหลัง ชั้น 4 ฝั่งตะวันออก",
+        "labelEn": ""
+      },
+      {
+        "id": "b4_f4_s",
+        "buildingId": "4F",
+        "floor": 4,
+        "x": -14.5,
+        "y": 11.4,
+        "z": -3.6,
+        "kind": "stair",
+        "label": "บันไดตึกหลัง ชั้น 4",
+        "labelEn": ""
+      },
+      {
+        "id": "b4_f1_lift",
+        "buildingId": "4F",
+        "floor": 1,
+        "x": 7.5,
+        "y": 0.6,
+        "z": -3.6,
+        "kind": "elevator",
+        "label": "ลิฟต์ตึกหลัง ชั้น 1",
+        "labelEn": "rear building elevator (Floor 1)"
+      },
+      {
+        "id": "b4_f2_lift",
+        "buildingId": "4F",
+        "floor": 2,
+        "x": 7.5,
+        "y": 4.2,
+        "z": -3.6,
+        "kind": "elevator",
+        "label": "ลิฟต์ตึกหลัง ชั้น 2",
+        "labelEn": "rear building elevator (Floor 2)"
+      },
+      {
+        "id": "b4_f3_lift",
+        "buildingId": "4F",
+        "floor": 3,
+        "x": 7.5,
+        "y": 7.8,
+        "z": -3.6,
+        "kind": "elevator",
+        "label": "ลิฟต์ตึกหลัง ชั้น 3",
+        "labelEn": "rear building elevator (Floor 3)"
+      },
+      {
+        "id": "b4_f4_lift",
+        "buildingId": "4F",
+        "floor": 4,
+        "x": 7.5,
+        "y": 11.4,
+        "z": -3.6,
+        "kind": "elevator",
+        "label": "ลิฟต์ตึกหลัง ชั้น 4",
+        "labelEn": "rear building elevator (Floor 4)"
+      },
+      {
+        "id": "b4_f4_w",
+        "buildingId": "4F",
+        "floor": 4,
+        "x": -10,
+        "y": 11.4,
+        "z": -3.6,
+        "kind": "corridor",
+        "label": "ตึกหลัง ชั้น 4 ฝั่งตะวันตก",
+        "labelEn": ""
+      },
+      {
+        "id": "bridge_n",
+        "buildingId": null,
+        "floor": 2,
+        "x": -2.2,
+        "y": 4.2,
+        "z": -3.4,
+        "kind": "bridge",
+        "label": "ทางเชื่อมชั้น 2 (ฝั่งตึกหลัง)",
+        "labelEn": "the floor-2 bridge (rear side)"
+      },
+      {
+        "id": "bridge_s",
+        "buildingId": null,
+        "floor": 2,
+        "x": -2.2,
+        "y": 4.2,
+        "z": 3.9,
+        "kind": "bridge",
+        "label": "ทางเชื่อมชั้น 2 (ฝั่งตึกหน้า)",
+        "labelEn": "the floor-2 bridge (front side)"
+      },
+      {
+        "id": "drive_mid_c",
+        "buildingId": null,
+        "floor": 1,
+        "x": -2.2,
+        "y": 0.6,
+        "z": 0,
+        "kind": "corridor",
+        "label": "ใต้ทางเชื่อมชั้น 2",
+        "labelEn": "the area under the floor-2 bridge"
+      },
+      {
+        "id": "drive_mid_e",
+        "buildingId": null,
+        "floor": 1,
+        "x": 10,
+        "y": 0.6,
+        "z": 0,
+        "kind": "corridor",
+        "label": "ลานกลางฝั่งตะวันออก",
+        "labelEn": "the east courtyard"
+      },
+      {
+        "id": "drive_mid_w",
+        "buildingId": null,
+        "floor": 1,
+        "x": -8,
+        "y": 0.6,
+        "z": 0,
+        "kind": "corridor",
+        "label": "ลานกลางระหว่างอาคาร",
+        "labelEn": "the central courtyard"
+      },
+      {
+        "id": "east_drive",
+        "buildingId": null,
+        "floor": 1,
+        "x": 13.5,
+        "y": 0.6,
+        "z": -8,
+        "kind": "corridor",
+        "label": "ถนนข้างฝั่งตะวันออก",
+        "labelEn": "the east driveway"
+      },
+      {
+        "id": "east_drive_n",
+        "buildingId": null,
+        "floor": 1,
+        "x": 13.5,
+        "y": 0.6,
+        "z": -15,
+        "kind": "corridor",
+        "label": "ถนนข้างฝั่งตะวันออก (เหนือ)",
+        "labelEn": "the east driveway (north)"
+      },
+      {
+        "id": "ent_front",
+        "buildingId": null,
+        "floor": 1,
+        "x": -8.5,
+        "y": 0.6,
+        "z": 17,
+        "kind": "entrance",
+        "label": "ทางเข้าหน้าสำนักงาน",
+        "labelEn": "the main entrance"
+      },
+      {
+        "id": "fda_front",
+        "buildingId": "FDA",
+        "floor": 1,
+        "x": -3.5,
+        "y": 0.6,
+        "z": -16,
+        "kind": "entrance",
+        "label": "หน้าศูนย์ OSSC",
+        "labelEn": "the OSSC annex entrance"
+      },
+      {
+        "id": "gate_back",
+        "buildingId": null,
+        "floor": 1,
+        "x": 13.5,
+        "y": 0.6,
+        "z": -23.5,
+        "kind": "gate",
+        "label": "ประตูหลัง ถนนชาภูบาล",
+        "labelEn": "the back gate (Chaphubal Rd)"
+      },
+      {
+        "id": "ttm_door",
+        "buildingId": "TTM",
+        "floor": 1,
+        "x": 15.8,
+        "y": 0.6,
+        "z": -11.5,
+        "kind": "entrance",
+        "label": "ทางเข้าคลินิกแพทย์แผนไทย",
+        "labelEn": "the Thai medicine clinic entrance"
+      },
+      {
+        "id": "yard_back",
+        "buildingId": null,
+        "floor": 1,
+        "x": 8,
+        "y": 0.6,
+        "z": -15,
+        "kind": "corridor",
+        "label": "ลานหลังตึก 4 ชั้น",
+        "labelEn": "the yard behind the rear building"
+      },
+      {
+        "id": "yard_front",
+        "buildingId": null,
+        "floor": 1,
+        "x": -8.5,
+        "y": 0.6,
+        "z": 14.5,
+        "kind": "corridor",
+        "label": "ลานหน้าตึก 2 ชั้น",
+        "labelEn": "the front yard"
+      }
+    ],
+    "edges": [
+      {
+        "a": "b2_f1_c",
+        "b": "b2_f1_e",
+        "accessible": true
+      },
+      {
+        "a": "b2_f1_c",
+        "b": "b2_f1_n",
+        "accessible": true
+      },
+      {
+        "a": "b2_f1_n",
+        "b": "drive_mid_c",
+        "accessible": true
+      },
+      {
+        "a": "b2_f1_s",
+        "b": "b2_f1_w",
+        "accessible": true
+      },
+      {
+        "a": "b2_f1_s",
+        "b": "b2_f2_s",
+        "accessible": false
+      },
+      {
+        "a": "b2_f1_w",
+        "b": "b2_f1_c",
+        "accessible": true
+      },
+      {
+        "a": "b2_f2_c",
+        "b": "b2_f2_e",
+        "accessible": true
+      },
+      {
+        "a": "b2_f2_c",
+        "b": "bridge_s",
+        "accessible": true
+      },
+      {
+        "a": "b2_f2_s",
+        "b": "b2_f2_w",
+        "accessible": true
+      },
+      {
+        "a": "b2_f2_w",
+        "b": "b2_f2_c",
+        "accessible": true
+      },
+      {
+        "a": "b4_f1_c",
+        "b": "b4_f1_e",
+        "accessible": true
+      },
+      {
+        "a": "b4_f1_s",
+        "b": "b4_f1_w",
+        "accessible": true
+      },
+      {
+        "a": "b4_f1_s",
+        "b": "b4_f2_s",
+        "accessible": false
+      },
+      {
+        "a": "b4_f1_w",
+        "b": "b4_f1_c",
+        "accessible": true
+      },
+      {
+        "a": "b4_f2_c",
+        "b": "b4_f2_e",
+        "accessible": true
+      },
+      {
+        "a": "b4_f2_s",
+        "b": "b4_f2_w",
+        "accessible": true
+      },
+      {
+        "a": "b4_f2_s",
+        "b": "b4_f3_s",
+        "accessible": false
+      },
+      {
+        "a": "b4_f2_w",
+        "b": "b4_f2_c",
+        "accessible": true
+      },
+      {
+        "a": "b4_f3_c",
+        "b": "b4_f3_e",
+        "accessible": true
+      },
+      {
+        "a": "b4_f3_s",
+        "b": "b4_f3_w",
+        "accessible": true
+      },
+      {
+        "a": "b4_f3_s",
+        "b": "b4_f4_s",
+        "accessible": false
+      },
+      {
+        "a": "b4_f3_w",
+        "b": "b4_f3_c",
+        "accessible": true
+      },
+      {
+        "a": "b4_f4_c",
+        "b": "b4_f4_e",
+        "accessible": true
+      },
+      {
+        "a": "b4_f1_e",
+        "b": "b4_f1_lift",
+        "accessible": true
+      },
+      {
+        "a": "b4_f2_e",
+        "b": "b4_f2_lift",
+        "accessible": true
+      },
+      {
+        "a": "b4_f3_e",
+        "b": "b4_f3_lift",
+        "accessible": true
+      },
+      {
+        "a": "b4_f4_e",
+        "b": "b4_f4_lift",
+        "accessible": true
+      },
+      {
+        "a": "b4_f1_lift",
+        "b": "b4_f2_lift",
+        "accessible": true
+      },
+      {
+        "a": "b4_f2_lift",
+        "b": "b4_f3_lift",
+        "accessible": true
+      },
+      {
+        "a": "b4_f3_lift",
+        "b": "b4_f4_lift",
+        "accessible": true
+      },
+      {
+        "a": "b4_f4_s",
+        "b": "b4_f4_w",
+        "accessible": true
+      },
+      {
+        "a": "b4_f4_w",
+        "b": "b4_f4_c",
+        "accessible": true
+      },
+      {
+        "a": "bridge_n",
+        "b": "b4_f2_c",
+        "accessible": true
+      },
+      {
+        "a": "bridge_s",
+        "b": "bridge_n",
+        "accessible": true
+      },
+      {
+        "a": "drive_mid_c",
+        "b": "b4_f1_c",
+        "accessible": true
+      },
+      {
+        "a": "drive_mid_c",
+        "b": "drive_mid_e",
+        "accessible": true
+      },
+      {
+        "a": "drive_mid_e",
+        "b": "b4_f1_e",
+        "accessible": true
+      },
+      {
+        "a": "drive_mid_e",
+        "b": "east_drive",
+        "accessible": true
+      },
+      {
+        "a": "drive_mid_w",
+        "b": "b4_f1_w",
+        "accessible": true
+      },
+      {
+        "a": "drive_mid_w",
+        "b": "drive_mid_c",
+        "accessible": true
+      },
+      {
+        "a": "east_drive",
+        "b": "east_drive_n",
+        "accessible": true
+      },
+      {
+        "a": "east_drive",
+        "b": "ttm_door",
+        "accessible": true
+      },
+      {
+        "a": "east_drive_n",
+        "b": "gate_back",
+        "accessible": true
+      },
+      {
+        "a": "east_drive_n",
+        "b": "yard_back",
+        "accessible": true
+      },
+      {
+        "a": "ent_front",
+        "b": "yard_front",
+        "accessible": true
+      },
+      {
+        "a": "yard_back",
+        "b": "b4_f1_bk",
+        "accessible": true
+      },
+      {
+        "a": "yard_back",
+        "b": "fda_front",
+        "accessible": true
+      },
+      {
+        "a": "yard_front",
+        "b": "b2_f1_w",
+        "accessible": true
+      }
+    ]
+  },
+  "bookings": []
+}
