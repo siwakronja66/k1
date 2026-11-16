@@ -18,6 +18,9 @@ if (is_post()) {
     } catch (HttpError $e) {
         flash($e->getMessage(), false);
         redirect('login.php');
+    } catch (Throwable $e) {
+        flash('ไม่สามารถเชื่อมต่อฐานข้อมูลได้ (กรุณาตรวจสอบว่า MySQL กำลังทำงาน): ' . $e->getMessage(), false);
+        redirect('login.php');
     }
 }
 
