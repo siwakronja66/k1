@@ -2,7 +2,7 @@
 // Shell (html/js/css/json) and snapshot API: network-first, cached copy when offline.
 // Fonts/images: cache-first. Bump VERSION to purge old caches.
 // Admin and other API routes are never cached.
-const VERSION = 'ssj3d-v13';
+const VERSION = 'ssj3d-v14';
 const SHELL = [
     './', 'index.html', 'js/app.js', 'manifest.webmanifest', 'assets/icon.svg', 'data/snapshot.json',
     'vendor/app.css', 'vendor/fonts.css', 'vendor/three.min.js', 'vendor/fontawesome/css/all.min.css',
@@ -39,7 +39,7 @@ self.addEventListener('fetch', (e) => {
     if (url.pathname.includes('/api/')) return;
 
     // Fonts/images rarely change: cache-first.
-    if (/\.(woff2|jpg|png|svg)$/.test(url.pathname)) {
+    if (/\.(woff2|jpg|jpeg|png|svg|webp)$/i.test(url.pathname)) {
         e.respondWith(caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
             if (res.ok) {
                 const copy = res.clone();
