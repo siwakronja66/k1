@@ -751,6 +751,66 @@ function photo_row(int|string $idOrKey): ?array
     return $st->fetch() ?: null;
 }
 
+function auto_optimize_uploaded_image(string $filePath, string $ext): void
+{
+    if (!extension_loaded('gd') || !is_file($filePath)) {
+        return;
+    }
+    $info = @getimagesize($filePath);
+    if (!$info) {
+        return;
+    }
+    $w = (int)$info[0];
+    $h = (int)$info[1];
+    $maxDim = 1600;
+
+    // Skip if already small and dimensions are within 1600px
+    if ($w <= $maxDim && $h <= $maxDim && filesize($filePath) < 350 * 1024) {
+        return;
+    }
+
+    $srcImg = match (strtolower($ext)) {
+        'jpg', 'jpeg' => @imagecreatefromjpeg($filePath),
+        'png'         => @imagecreatefrompng($filePath),
+        'webp'        => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($filePath) : null,
+        default       => null,
+    };
+    if (!$srcImg) {
+        return;
+    }
+
+    if ($w > $maxDim || $h > $maxDim) {
+        if ($w >= $h) {
+            $newW = $maxDim;
+            $newH = (int)round(($h * $maxDim) / $w);
+        } else {
+            $newH = $maxDim;
+            $newW = (int)round(($w * $maxDim) / $h);
+        }
+    } else {
+        $newW = $w;
+        $newH = $h;
+    }
+
+    $destImg = imagecreatetruecolor($newW, $newH);
+    if ($ext === 'png') {
+        imagealphablending($destImg, false);
+        imagesavealpha($destImg, true);
+    }
+    imagecopyresampled($destImg, $srcImg, 0, 0, 0, 0, $newW, $newH, $w, $h);
+
+    if ($ext === 'jpg' || $ext === 'jpeg') {
+        imagejpeg($destImg, $filePath, 84);
+    } elseif ($ext === 'png') {
+        imagepng($destImg, $filePath, 8);
+    } elseif ($ext === 'webp' && function_exists('imagewebp')) {
+        imagewebp($destImg, $filePath, 84);
+    }
+
+    imagedestroy($destImg);
+    imagedestroy($srcImg);
+}
+
 function photo_upload(array $user, string $photoKey, array $file, ?string $title = null, ?string $roomId = null, string $category = 'spot'): array
 {
     require_admin($user);
@@ -829,9 +889,14 @@ function photo_upload(array $user, string $photoKey, array $file, ?string $title
         throw new HttpError(500, 'ไม่สามารถบันทึกไฟล์รูปภาพลงในไดเรกทอรี public/assets/ ได้ (ตรวจสอบสิทธิ์การเขียนไฟล์)');
     }
 
+    // Automatically optimize uploaded photo to max 1600px Full HD and compress size
+    auto_optimize_uploaded_image($destPath, $ext);
+    clearstatcache(true, $destPath);
+
     $fileSize = (int)filesize($destPath);
-    $width = (int)$imgInfo[0];
-    $height = (int)$imgInfo[1];
+    $optimizedInfo = @getimagesize($destPath) ?: $imgInfo;
+    $width = (int)$optimizedInfo[0];
+    $height = (int)$optimizedInfo[1];
 
     if ($existing) {
         $st = db()->prepare('UPDATE photos
