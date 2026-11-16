@@ -55,7 +55,6 @@ $errors = [];
 foreach ($dsnPairs as [$dsnDb, $dsnServer]) {
     foreach ($candidates as [$u, $p]) {
         try {
-            // Try connecting directly to database
             $testPdo = new PDO($dsnDb, $u, $p, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -65,7 +64,6 @@ foreach ($dsnPairs as [$dsnDb, $dsnServer]) {
             break 2;
         } catch (Throwable $e1) {
             $errors[] = "[$u@{$dsnDb}]: " . $e1->getMessage();
-            // Try connecting to server root to create database
             try {
                 $serverPdo = new PDO($dsnServer, $u, $p, [
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -86,18 +84,7 @@ foreach ($dsnPairs as [$dsnDb, $dsnServer]) {
 }
 
 if (!$connectedPdo) {
-    echo "\n=======================================================\n";
-    echo "[!] ไม่สามารถเชื่อมต่อฐานข้อมูล MySQL ได้ในขณะนี้\n";
-    echo "=======================================================\n";
-    echo "สาเหตุที่เป็นไปได้มากที่สุด:\n";
-    echo " 1. เซอร์วิส MySQL ยังไม่ได้เริ่มทำงาน กรุณารันคำสั่ง:\n";
-    echo "    >>>  sudo systemctl start mysql\n";
-    echo "    (หรือเช็คสถานะด้วย: sudo systemctl status mysql)\n\n";
-    echo " 2. หากยังไม่ได้ติดตั้ง MySQL บนเซิร์ฟเวอร์ กรุณารัน:\n";
-    echo "    >>>  sudo apt update && sudo apt install -y mysql-server\n\n";
-    echo " 3. หรือหากรันระบบผ่าน Docker บนเซิร์ฟเวอร์ กรุณารัน:\n";
-    echo "    >>>  sudo docker compose up -d\n";
-    echo "=======================================================\n\n";
+    echo "\n[ERROR] ไม่สามารถเชื่อมต่อฐานข้อมูล MySQL ได้ กรุณาตรวจสอบว่าบริการ MySQL กำลังทำงาน\n";
     exit(1);
 }
 
@@ -144,6 +131,14 @@ if (!$hasBuildings) {
     echo "[OK] นำเข้าข้อมูลอาคาร ห้อง และกลุ่มงานเริ่มต้นเรียบร้อยแล้ว!\n";
 }
 
+// Ensure correct rate_limits schema (fixed-window counter with window_start)
+try {
+    $colCheck = $connectedPdo->query("SHOW COLUMNS FROM rate_limits LIKE 'window_start'")->fetch();
+    if (!$colCheck) {
+        $connectedPdo->exec("DROP TABLE IF EXISTS rate_limits;");
+    }
+} catch (Throwable) {}
+
 $connectedPdo->exec("
 CREATE TABLE IF NOT EXISTS users (
     id            INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -158,11 +153,10 @@ CREATE TABLE IF NOT EXISTS users (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS rate_limits (
-    bucket     VARCHAR(100) NOT NULL,
-    ip         VARCHAR(45)  NOT NULL,
-    hits       INT UNSIGNED NOT NULL DEFAULT 1,
-    reset_at   INT UNSIGNED NOT NULL,
-    PRIMARY KEY (bucket, ip)
+    bucket       VARCHAR(100) NOT NULL,
+    window_start DATETIME     NOT NULL,
+    hits         INT UNSIGNED NOT NULL DEFAULT 0,
+    PRIMARY KEY (bucket, window_start)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS data_version (
@@ -171,6 +165,31 @@ CREATE TABLE IF NOT EXISTS data_version (
 ) ENGINE=InnoDB;
 INSERT IGNORE INTO data_version (id, version) VALUES (1, 1);
 ");
+
+// Apply pending migrations automatically
+$migrationsDir = __DIR__ . '/../db/migrations';
+if (is_dir($migrationsDir)) {
+    $connectedPdo->exec("CREATE TABLE IF NOT EXISTS schema_migrations (
+        version    VARCHAR(100) NOT NULL PRIMARY KEY,
+        applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB");
+    $applied = array_flip($connectedPdo->query('SELECT version FROM schema_migrations')->fetchAll(PDO::FETCH_COLUMN));
+    $mFiles = glob($migrationsDir . '/*.sql') ?: [];
+    sort($mFiles, SORT_STRING);
+    foreach ($mFiles as $mFile) {
+        $vName = basename($mFile, '.sql');
+        if (isset($applied[$vName])) continue;
+        $mSql = (string)file_get_contents($mFile);
+        $stmts = array_filter(array_map('trim', preg_split('/;\s*$/m', $mSql)), fn($s) => $s !== '' && !preg_match('/^(--[^\n]*\s*)+$/', $s));
+        foreach ($stmts as $s) {
+            try { $connectedPdo->exec($s); } catch (Throwable) {}
+        }
+        try {
+            $connectedPdo->prepare('INSERT INTO schema_migrations (version) VALUES (?)')->execute([$vName]);
+            echo "[INFO] Migration applied: {$vName}\n";
+        } catch (Throwable) {}
+    }
+}
 
 // 4. Set admin user password to 123456
 $username = 'admin';
