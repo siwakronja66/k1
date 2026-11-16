@@ -100,6 +100,7 @@ function is_admin(array $user): bool
 
 const ADMIN_MENU = [
     // file => [label, adminOnly]
+    'dashboard.php'   => ['ภาพรวม', false],
     'departments.php' => ['กลุ่มงาน', false],
     'rooms.php'       => ['ห้อง / ผัง', false],
     'buildings.php'   => ['อาคาร', true],

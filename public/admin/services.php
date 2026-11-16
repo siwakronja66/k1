@@ -6,8 +6,8 @@ $user = admin_page();
 
 if (is_post()) {
     $action = (string)($_POST['action'] ?? '');
-    // stats.php posts here too ("add as keyword"); return there afterwards
-    $back = ($_POST['return'] ?? '') === 'stats' ? 'stats.php' : 'services.php';
+    $ret = (string)($_POST['return'] ?? '');
+    $back = in_array($ret, ['stats', 'dashboard'], true) ? $ret . '.php' : 'services.php';
     handle_post(function () use ($user, $action) {
         if ($action === 'create') {
             service_create($user, $_POST);

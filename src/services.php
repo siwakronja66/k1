@@ -972,3 +972,128 @@ function photo_delete(array $user, int $id): void
 
     bump_data_version();
 }
+
+/**
+ * Comprehensive dashboard metrics and health check for the administration console.
+ */
+function dashboard_summary(array $user): array
+{
+    $pdo = db();
+
+    // 1. Buildings & structure
+    $buildings = $pdo->query('SELECT id, name, short_name, floors, color FROM buildings ORDER BY sort_order')->fetchAll();
+    $bldCount = count($buildings);
+
+    // 2. Rooms count & breakdown
+    $roomsCount = (int)$pdo->query('SELECT count(*) FROM rooms')->fetchColumn();
+    $meetingRoomsCount = (int)$pdo->query('
+        SELECT count(DISTINCT r.id)
+        FROM rooms r
+        JOIN room_assignments ra ON ra.room_id = r.id AND ra.valid_to IS NULL
+        JOIN departments d ON d.id = ra.department_id
+        WHERE d.type = "meeting"
+    ')->fetchColumn();
+
+    // 3. Active departments & breakdown by type
+    $depts = dept_list($user);
+    $deptsCount = (int)$pdo->query('SELECT count(*) FROM departments WHERE is_active = 1')->fetchColumn();
+    $deptTypeCounts = $pdo->query('
+        SELECT type, count(*) as count
+        FROM departments
+        WHERE is_active = 1
+        GROUP BY type
+    ')->fetchAll(PDO::FETCH_KEY_PAIR);
+
+    // 4. Bookings for today and upcoming
+    $todayStr = date('Y-m-d');
+    $stToday = $pdo->prepare("
+        SELECT b.id, b.room_id, r.room_no, b.title, b.department_id, d.name AS department_name,
+               DATE_FORMAT(b.starts_at, '%Y-%m-%d %H:%i') AS starts_at,
+               DATE_FORMAT(b.ends_at, '%Y-%m-%d %H:%i') AS ends_at,
+               b.created_by, u.username AS created_by_name
+        FROM bookings b
+        JOIN rooms r ON r.id = b.room_id
+        LEFT JOIN departments d ON d.id = b.department_id
+        LEFT JOIN users u ON u.id = b.created_by
+        WHERE DATE(b.starts_at) <= ? AND DATE(b.ends_at) >= ?
+        ORDER BY b.starts_at ASC
+    ");
+    $stToday->execute([$todayStr, $todayStr]);
+    $bookingsToday = $stToday->fetchAll();
+
+    $nowHm = date('Y-m-d H:i');
+    foreach ($bookingsToday as &$bk) {
+        $bk['is_now'] = ($bk['starts_at'] <= $nowHm && $bk['ends_at'] >= $nowHm);
+        $bk['is_past'] = ($bk['ends_at'] < $nowHm);
+    }
+    unset($bk);
+
+    $upcomingBookingsCount = (int)$pdo->query("
+        SELECT count(*) FROM bookings WHERE starts_at >= NOW() AND starts_at <= NOW() + INTERVAL 7 DAY
+    ")->fetchColumn();
+
+    // 5. Photos status and storage footprint
+    $photos = $pdo->query('SELECT * FROM photos ORDER BY category, spot_index, id')->fetchAll();
+    $assetsDir = realpath(__DIR__ . '/../public/assets') ?: (__DIR__ . '/../public/assets');
+    $photoTotal = count($photos);
+    $photoExists = 0;
+    $missingPhotos = [];
+    $totalAssetBytes = 0;
+
+    if (is_dir($assetsDir)) {
+        foreach (scandir($assetsDir) as $f) {
+            if ($f !== '.' && $f !== '..' && is_file($assetsDir . '/' . $f)) {
+                $totalAssetBytes += filesize($assetsDir . '/' . $f);
+            }
+        }
+    }
+
+    foreach ($photos as $p) {
+        $pPath = $assetsDir . '/' . $p['file_name'];
+        if (file_exists($pPath) && filesize($pPath) > 0) {
+            $photoExists++;
+        } else {
+            $missingPhotos[] = $p;
+        }
+    }
+
+    // 6. Search statistics (last 30 days)
+    $searchStats = search_stats($user, 30);
+    $totalSearches = (int)$pdo->query("
+        SELECT COALESCE(SUM(hits), 0) FROM search_stats WHERE day >= CURDATE() - INTERVAL 30 DAY
+    ")->fetchColumn();
+
+    // 7. System & Version
+    $dataVersion = (int)$pdo->query('SELECT version FROM data_version WHERE id = 1')->fetchColumn();
+    $serverVersion = $pdo->getAttribute(PDO::ATTR_SERVER_VERSION) ?: 'MariaDB/MySQL';
+
+    // 8. Recent Audit Activity (admin only)
+    $recentAudits = [];
+    if (is_admin($user)) {
+        $recentAudits = $pdo->query('
+            SELECT id, username, action, entity, entity_id, before_json, after_json, ip, created_at
+            FROM audit_log ORDER BY id DESC LIMIT 5
+        ')->fetchAll();
+    }
+
+    return [
+        'buildings'               => $buildings,
+        'bld_count'               => $bldCount,
+        'rooms_count'             => $roomsCount,
+        'meeting_rooms_count'     => $meetingRoomsCount,
+        'depts'                   => $depts,
+        'depts_count'             => $deptsCount,
+        'dept_type_counts'        => $deptTypeCounts,
+        'bookings_today'          => $bookingsToday,
+        'upcoming_bookings_count' => $upcomingBookingsCount,
+        'photo_total'             => $photoTotal,
+        'photo_exists'            => $photoExists,
+        'missing_photos'          => $missingPhotos,
+        'total_asset_bytes'       => $totalAssetBytes,
+        'search_stats'            => $searchStats,
+        'total_searches'          => $totalSearches,
+        'data_version'            => $dataVersion,
+        'server_version'          => $serverVersion,
+        'recent_audits'           => $recentAudits,
+    ];
+}

@@ -5,7 +5,7 @@ require __DIR__ . '/../../src/admin.php';
 start_session();
 try {
     current_user();
-    redirect('departments.php');          // already logged in
+    redirect('dashboard.php');          // already logged in
 } catch (HttpError) {
     // not logged in: show form
 }
@@ -14,7 +14,7 @@ if (is_post()) {
     try {
         verify_form_csrf();
         auth_login((string)($_POST['username'] ?? ''), (string)($_POST['password'] ?? ''));
-        redirect('departments.php');
+        redirect('dashboard.php');
     } catch (HttpError $e) {
         flash($e->getMessage(), false);
         redirect('login.php');

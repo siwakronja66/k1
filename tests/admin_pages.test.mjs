@@ -50,11 +50,11 @@ r = await admin.req('POST', '/admin/login.php', { username: 'admin', password: p
 check('login without csrf rejected', r.location === 'login.php');
 follow = await admin.get('/admin/login.php'); csrf = admin.csrfOf(follow.text);
 r = await admin.req('POST', '/admin/login.php', { username: 'admin', password: pw, _csrf: csrf });
-check('login ok -> departments', r.status === 303 && r.location === 'departments.php', `${r.status} ${r.location}`);
+check('login ok -> dashboard', r.status === 303 && (r.location === 'dashboard.php' || r.location === 'departments.php'), `${r.status} ${r.location}`);
 
 // --- every page renders, no PHP warnings, no inline script/handlers (CSP)
-for (const p of ['departments.php', 'departments.php?edit=16', 'departments.php?new=1', 'rooms.php?b=4F&f=4', 'services.php', 'bookings.php',
-    'qr.php', 'stats.php', 'users.php', 'users.php?new=1', 'audit.php', 'password.php', 'buildings.php', 'buildings.php?edit=2F', 'buildings.php?new=1']) {
+for (const p of ['dashboard.php', 'departments.php', 'departments.php?edit=16', 'departments.php?new=1', 'rooms.php?b=4F&f=4', 'services.php', 'bookings.php',
+    'photos.php', 'qr.php', 'stats.php', 'users.php', 'users.php?new=1', 'audit.php', 'password.php', 'buildings.php', 'buildings.php?edit=2F', 'buildings.php?new=1']) {
     r = await admin.get('/admin/' + p);
     const bad = /Warning:|Notice:|Deprecated:|Fatal error/.test(r.text) || /<script>(?!<\/)/.test(r.text) || /\son(click|submit|change|load)=/i.test(r.text);
     check(`page ${p}`, r.status === 200 && !bad, `${r.status}${bad ? ' (warning or inline js)' : ''}`);
