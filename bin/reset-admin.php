@@ -112,7 +112,38 @@ if ($connectedUser === 'root') {
     } catch (Throwable) {}
 }
 
-// 3. Ensure required tables exist
+// 3. Ensure required tables and seed data exist
+$hasBuildings = false;
+try {
+    $res = $connectedPdo->query("SHOW TABLES LIKE 'buildings'")->fetchColumn();
+    $hasBuildings = !empty($res);
+} catch (Throwable) {}
+
+if (!$hasBuildings) {
+    echo "[INFO] กำลังนำเข้าโครงสร้างฐานข้อมูลเริ่มต้น (Schema & Seed data)...\n";
+    $sqlFiles = [
+        __DIR__ . '/../db/schema.sql',
+        __DIR__ . '/../db/seed.sql',
+        __DIR__ . '/../db/nav-seed.sql',
+    ];
+    foreach ($sqlFiles as $file) {
+        if (file_exists($file)) {
+            $sql = file_get_contents($file);
+            try {
+                $connectedPdo->exec($sql);
+            } catch (Throwable) {
+                $queries = array_filter(array_map('trim', explode(";\n", $sql)));
+                foreach ($queries as $q) {
+                    if ($q !== '') {
+                        try { $connectedPdo->exec($q); } catch (Throwable) {}
+                    }
+                }
+            }
+        }
+    }
+    echo "[OK] นำเข้าข้อมูลอาคาร ห้อง และกลุ่มงานเริ่มต้นเรียบร้อยแล้ว!\n";
+}
+
 $connectedPdo->exec("
 CREATE TABLE IF NOT EXISTS users (
     id            INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
