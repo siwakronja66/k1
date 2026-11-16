@@ -123,9 +123,9 @@ function page_start(string $title, string $active, ?array $user, array $scripts 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title><?= e($title) ?> · หลังบ้าน ผังอาคาร สสจ.มุกดาหาร</title>
-    <link rel="icon" href="../favicon.ico">
-    <link rel="icon" href="../assets/logo-moph.png" type="image/png">
-    <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/logo-moph.png?v=20261116B">
+    <link rel="shortcut icon" type="image/png" href="../assets/logo-moph.png?v=20261116B">
+    <link rel="apple-touch-icon" href="../apple-touch-icon.png?v=20261116B">
 <?php
     $appCssVer = @filemtime(__DIR__ . '/../public/vendor/app.css') ?: time();
     $confirmJsVer = @filemtime(__DIR__ . '/../public/admin/assets/confirm.js') ?: time();

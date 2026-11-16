@@ -2692,7 +2692,7 @@ function buildHTMLPins() {
     execEl.innerHTML = `
         <div onclick="focusRoom3D('R431')" class="bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 p-1 pr-2.5 rounded-full shadow-2xl border-2 border-white flex items-center gap-1.5">
             <img src="assets/dr-Narong3.png" class="w-7 h-7 rounded-full object-cover object-top bg-white border border-amber-900"
-                 onerror="this.src='assets/icon.svg'">
+                 onerror="this.onerror=null; this.src='assets/logo-moph.png'">
             <div class="leading-tight">
                 <div class="text-[10px] font-heading font-extrabold">นพ.ณรงค์ จันทร์แก้ว</div>
                 <div class="text-[9px] font-semibold">ห้องผู้บริหาร (ตึก 4F ชั้น 3)</div>
