@@ -123,7 +123,9 @@ function page_start(string $title, string $active, ?array $user, array $scripts 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title><?= e($title) ?> · หลังบ้าน ผังอาคาร สสจ.มุกดาหาร</title>
-    <link rel="icon" href="../assets/icon.svg" type="image/svg+xml">
+    <link rel="icon" href="../favicon.ico">
+    <link rel="icon" href="../assets/logo-moph.png" type="image/png">
+    <link rel="apple-touch-icon" href="../apple-touch-icon.png">
 <?php
     $appCssVer = @filemtime(__DIR__ . '/../public/vendor/app.css') ?: time();
     $confirmJsVer = @filemtime(__DIR__ . '/../public/admin/assets/confirm.js') ?: time();
@@ -143,7 +145,7 @@ function page_start(string $title, string $active, ?array $user, array $scripts 
 <?php if ($user): ?>
 <header class="bg-slate-900 border-b border-slate-800 px-4 py-2 flex flex-wrap items-center gap-3 no-print">
     <a href="../" class="flex items-center gap-2 font-heading font-bold">
-        <img src="../assets/icon.svg" alt="" class="w-7 h-7"> หลังบ้าน ผังอาคาร
+        <img src="../assets/logo-moph.png" alt="ตรา สสจ.มุกดาหาร" class="w-7 h-7 rounded-full bg-white p-0.5 shadow-sm"> หลังบ้าน ผังอาคาร
     </a>
     <nav class="flex flex-wrap gap-1 text-sm font-heading" aria-label="เมนูหลังบ้าน">
 <?php foreach (ADMIN_MENU as $file => [$label, $adminOnly]):
