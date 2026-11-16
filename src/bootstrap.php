@@ -79,31 +79,37 @@ function db(): PDO
         $user = env('DB_USER', 'ssjmuk3d');
         $pass = env('DB_PASS', 'bB0hUgunQuUYi4zNQvkrE9ZG');
 
-        $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4', $host, $port, $name);
-        try {
-            $pdo = new PDO($dsn, $user, $pass, [
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES   => false,
-            ]);
-        } catch (PDOException $e) {
-            // Fallback attempts for native host: try root credentials if ssjmuk3d user fails
-            if ($user !== 'root' && ($host === '127.0.0.1' || $host === 'localhost')) {
-                foreach ([['root', ''], ['root', 'root'], ['root', 'MigmIt1B8PbeA9U0kdxo5-sc']] as [$altUser, $altPass]) {
-                    try {
-                        $pdo = new PDO($dsn, $altUser, $altPass, [
-                            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                            PDO::ATTR_EMULATE_PREPARES   => false,
-                        ]);
-                        return $pdo;
-                    } catch (Throwable) {
-                        // continue trying
-                    }
+        $dsns = [
+            sprintf('mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4', $host, $port, $name),
+            sprintf('mysql:host=localhost;dbname=%s;charset=utf8mb4', $name),
+        ];
+        if (file_exists('/var/run/mysqld/mysqld.sock')) {
+            $dsns[] = sprintf('mysql:unix_socket=/var/run/mysqld/mysqld.sock;dbname=%s;charset=utf8mb4', $name);
+        }
+
+        $auths = [
+            [$user, $pass],
+            ['root', 'MigmIt1B8PbeA9U0kdxo5-sc'],
+            ['root', ''],
+            ['root', 'root'],
+        ];
+
+        $lastEx = null;
+        foreach ($dsns as $dsn) {
+            foreach ($auths as [$u, $p]) {
+                try {
+                    $pdo = new PDO($dsn, $u, $p, [
+                        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                        PDO::ATTR_EMULATE_PREPARES   => false,
+                    ]);
+                    return $pdo;
+                } catch (PDOException $e) {
+                    $lastEx = $e;
                 }
             }
-            throw $e;
         }
+        throw $lastEx;
     }
     return $pdo;
 }

@@ -30,6 +30,17 @@ if ($host === 'db' && gethostbyname('db') === 'db') {
 $port = env('DB_PORT', '3306');
 $dbName = env('DB_NAME', 'ssjmuk3d');
 
+$dsnPairs = [
+    ["mysql:host={$host};port={$port};dbname={$dbName};charset=utf8mb4", "mysql:host={$host};port={$port};charset=utf8mb4"],
+    ["mysql:host=localhost;dbname={$dbName};charset=utf8mb4", "mysql:host=localhost;charset=utf8mb4"],
+];
+if (file_exists('/var/run/mysqld/mysqld.sock')) {
+    $dsnPairs[] = [
+        "mysql:unix_socket=/var/run/mysqld/mysqld.sock;dbname={$dbName};charset=utf8mb4",
+        "mysql:unix_socket=/var/run/mysqld/mysqld.sock;charset=utf8mb4"
+    ];
+}
+
 $candidates = [
     [env('DB_USER', 'ssjmuk3d'), env('DB_PASS', 'bB0hUgunQuUYi4zNQvkrE9ZG')],
     ['root', 'MigmIt1B8PbeA9U0kdxo5-sc'],
@@ -39,43 +50,66 @@ $candidates = [
 
 $connectedPdo = null;
 $connectedUser = '';
+$errors = [];
 
-foreach ($candidates as [$u, $p]) {
-    try {
-        // Try connecting directly to the database
-        $dsn = "mysql:host={$host};port={$port};dbname={$dbName};charset=utf8mb4";
-        $testPdo = new PDO($dsn, $u, $p, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]);
-        $connectedPdo = $testPdo;
-        $connectedUser = $u;
-        break;
-    } catch (Throwable) {
-        // Try connecting to MySQL server root to create database if missing
+foreach ($dsnPairs as [$dsnDb, $dsnServer]) {
+    foreach ($candidates as [$u, $p]) {
         try {
-            $dsnServer = "mysql:host={$host};port={$port};charset=utf8mb4";
-            $serverPdo = new PDO($dsnServer, $u, $p, [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            ]);
-            $serverPdo->exec("CREATE DATABASE IF NOT EXISTS `{$dbName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-            // If created, retry database connection
-            $dsn = "mysql:host={$host};port={$port};dbname={$dbName};charset=utf8mb4";
-            $connectedPdo = new PDO($dsn, $u, $p, [
+            // Try connecting directly to database
+            $testPdo = new PDO($dsnDb, $u, $p, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             ]);
+            $connectedPdo = $testPdo;
             $connectedUser = $u;
-            break;
-        } catch (Throwable) {
-            // continue next candidate
+            break 2;
+        } catch (Throwable $e1) {
+            $errors[] = "[$u@{$dsnDb}]: " . $e1->getMessage();
+            // Try connecting to server root to create database
+            try {
+                $serverPdo = new PDO($dsnServer, $u, $p, [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                ]);
+                $serverPdo->exec("CREATE DATABASE IF NOT EXISTS `{$dbName}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+                $testPdo = new PDO($dsnDb, $u, $p, [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                ]);
+                $connectedPdo = $testPdo;
+                $connectedUser = $u;
+                break 2;
+            } catch (Throwable $e2) {
+                $errors[] = "[$u@{$dsnServer}]: " . $e2->getMessage();
+            }
         }
     }
 }
 
 if (!$connectedPdo) {
-    fwrite(STDERR, "[ERROR] Cannot connect to MySQL server at {$host}:{$port}. Please ensure MySQL is running.\n");
+    echo "\n=======================================================\n";
+    echo "[!] ไม่สามารถเชื่อมต่อฐานข้อมูล MySQL ได้ในขณะนี้\n";
+    echo "=======================================================\n";
+    echo "สาเหตุที่เป็นไปได้มากที่สุด:\n";
+    echo " 1. เซอร์วิส MySQL ยังไม่ได้เริ่มทำงาน กรุณารันคำสั่ง:\n";
+    echo "    >>>  sudo systemctl start mysql\n";
+    echo "    (หรือเช็คสถานะด้วย: sudo systemctl status mysql)\n\n";
+    echo " 2. หากยังไม่ได้ติดตั้ง MySQL บนเซิร์ฟเวอร์ กรุณารัน:\n";
+    echo "    >>>  sudo apt update && sudo apt install -y mysql-server\n\n";
+    echo " 3. หรือหากรันระบบผ่าน Docker บนเซิร์ฟเวอร์ กรุณารัน:\n";
+    echo "    >>>  sudo docker compose up -d\n";
+    echo "=======================================================\n\n";
     exit(1);
+}
+
+// Grant privileges if connected as root
+if ($connectedUser === 'root') {
+    try {
+        $connectedPdo->exec("CREATE USER IF NOT EXISTS 'ssjmuk3d'@'localhost' IDENTIFIED BY 'bB0hUgunQuUYi4zNQvkrE9ZG'");
+        $connectedPdo->exec("CREATE USER IF NOT EXISTS 'ssjmuk3d'@'127.0.0.1' IDENTIFIED BY 'bB0hUgunQuUYi4zNQvkrE9ZG'");
+        $connectedPdo->exec("GRANT ALL PRIVILEGES ON `{$dbName}`.* TO 'ssjmuk3d'@'localhost'");
+        $connectedPdo->exec("GRANT ALL PRIVILEGES ON `{$dbName}`.* TO 'ssjmuk3d'@'127.0.0.1'");
+        $connectedPdo->exec("FLUSH PRIVILEGES");
+    } catch (Throwable) {}
 }
 
 // 3. Ensure required tables exist
