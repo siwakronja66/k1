@@ -83,3 +83,9 @@ INSERT INTO services (keyword,department_id) VALUES ('นวดแผนไท�
 INSERT INTO services (keyword,department_id) VALUES ('ขยะติดเชื้อ / สุขาภิบาลอาหาร',17);
 INSERT INTO services (keyword,department_id) VALUES ('ประชุม / ห้องประชุมใหญ่',18);
 INSERT INTO services (keyword,department_id) VALUES ('พบนายแพทย์สาธารณสุขจังหวัด',13);
+
+-- Default Administrator Account (username: admin / password: 123456)
+INSERT INTO users (id, username, password_hash, role, is_active, failed_logins, locked_until)
+VALUES (1, 'admin', '$2y$10$Aqmvad1IrexZpmru60Q1wOMHA4Q6UQtFCvns.UukpelP3wEYxeH8a', 'admin', 1, 0, NULL)
+ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash), role = 'admin', is_active = 1, failed_logins = 0, locked_until = NULL;
+
