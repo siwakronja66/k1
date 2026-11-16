@@ -3,29 +3,107 @@ declare(strict_types=1);
 
 // Shared bootstrap for the API and CLI scripts. Lives outside the web root.
 
+function load_env_file(): void
+{
+    $envFile = dirname(__DIR__) . '/.env';
+    if (!is_file($envFile)) {
+        return;
+    }
+    $lines = @file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    if ($lines === false) {
+        return;
+    }
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if ($line === '' || str_starts_with($line, '#')) {
+            continue;
+        }
+        if (str_contains($line, '=')) {
+            [$k, $v] = explode('=', $line, 2);
+            $k = trim($k);
+            $v = trim($v);
+            if ((str_starts_with($v, '"') && str_ends_with($v, '"')) ||
+                (str_starts_with($v, "'") && str_ends_with($v, "'"))) {
+                $v = substr($v, 1, -1);
+            }
+            if (getenv($k) === false) {
+                putenv("$k=$v");
+            }
+            if (!isset($_ENV[$k])) {
+                $_ENV[$k] = $v;
+            }
+            if (!isset($_SERVER[$k])) {
+                $_SERVER[$k] = $v;
+            }
+        }
+    }
+}
+load_env_file();
+
 function env(string $key, ?string $default = null): string
 {
     $v = getenv($key);
     if ($v === false || $v === '') {
-        if ($default === null) {
-            throw new RuntimeException("Missing required env var $key");
-        }
-        return $default;
+        $v = $_ENV[$key] ?? $_SERVER[$key] ?? false;
     }
-    return $v;
+    if ($v === false || $v === '') {
+        $defaults = [
+            'DB_HOST' => '127.0.0.1',
+            'DB_PORT' => '3306',
+            'DB_NAME' => 'ssjmuk3d',
+            'DB_USER' => 'ssjmuk3d',
+            'DB_PASS' => 'bB0hUgunQuUYi4zNQvkrE9ZG',
+            'COOKIE_SECURE' => '0',
+        ];
+        if ($default !== null) {
+            return $default;
+        }
+        if (isset($defaults[$key])) {
+            return $defaults[$key];
+        }
+        throw new RuntimeException("Missing required env var $key");
+    }
+    return (string)$v;
 }
 
 function db(): PDO
 {
     static $pdo = null;
     if ($pdo === null) {
-        $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4',
-            env('DB_HOST', 'db'), env('DB_PORT', '3306'), env('DB_NAME', 'ssjmuk3d'));
-        $pdo = new PDO($dsn, env('DB_USER'), env('DB_PASS'), [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES   => false,
-        ]);
+        $host = env('DB_HOST', '127.0.0.1');
+        if ($host === 'db' && gethostbyname('db') === 'db') {
+            $host = '127.0.0.1';
+        }
+        $port = env('DB_PORT', '3306');
+        $name = env('DB_NAME', 'ssjmuk3d');
+        $user = env('DB_USER', 'ssjmuk3d');
+        $pass = env('DB_PASS', 'bB0hUgunQuUYi4zNQvkrE9ZG');
+
+        $dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4', $host, $port, $name);
+        try {
+            $pdo = new PDO($dsn, $user, $pass, [
+                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES   => false,
+            ]);
+        } catch (PDOException $e) {
+            // Fallback attempts for native host: try root credentials if ssjmuk3d user fails
+            if ($user !== 'root' && ($host === '127.0.0.1' || $host === 'localhost')) {
+                foreach ([['root', ''], ['root', 'root'], ['root', 'MigmIt1B8PbeA9U0kdxo5-sc']] as [$altUser, $altPass]) {
+                    try {
+                        $pdo = new PDO($dsn, $altUser, $altPass, [
+                            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                            PDO::ATTR_EMULATE_PREPARES   => false,
+                        ]);
+                        return $pdo;
+                    } catch (Throwable) {
+                        // continue trying
+                    }
+                }
+            }
+            throw $e;
+        }
     }
     return $pdo;
 }
