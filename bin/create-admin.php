@@ -25,6 +25,10 @@ db()->prepare('INSERT INTO users (username, password_hash, role) VALUES (?, ?, \
                ON DUPLICATE KEY UPDATE password_hash = VALUES(password_hash), role = \'admin\', is_active = 1,
                                        failed_logins = 0, locked_until = NULL')
     ->execute([$username, password_hash($password, PASSWORD_DEFAULT)]);
+// Clear any rate-limiting lockouts on login
+try {
+    db()->exec("DELETE FROM rate_limits WHERE bucket LIKE 'login:%'");
+} catch (Throwable) {}
 db()->prepare('INSERT INTO audit_log (user_id, username, action, entity, entity_id, ip) VALUES (NULL, ?, ?, ?, ?, ?)')
     ->execute(['cli', 'user.admin_cli', 'user', $username, 'cli']);
-echo "admin '$username' ready\n";
+echo "admin '$username' ready (password updated and locks cleared)\n";

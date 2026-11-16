@@ -118,14 +118,22 @@ function start_session(): void
     if (session_status() === PHP_SESSION_ACTIVE) {
         return;
     }
-    $secure = env('COOKIE_SECURE', '1') === '1';
+    // Auto-detect HTTPS: only set Secure=true when actually accessed via HTTPS,
+    // otherwise plain HTTP (e.g. internal IP like http://172.16.88.32) causes browsers
+    // to silently drop the session cookie, causing an immediate redirect loop back to login.php.
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (($_SERVER['SERVER_PORT'] ?? 0) == 443)
+            || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower((string)$_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https');
+    $secureEnv = env('COOKIE_SECURE', null);
+    $secure = $secureEnv !== null ? ($secureEnv === '1' && $isHttps) : $isHttps;
+
     session_name('ssj3d_sid');
     session_set_cookie_params([
         'lifetime' => 0,
         'path'     => '/',
         'secure'   => $secure,
         'httponly' => true,
-        'samesite' => 'Strict',
+        'samesite' => 'Lax',
     ]);
     ini_set('session.use_strict_mode', '1');
     ini_set('session.gc_maxlifetime', '7200');
