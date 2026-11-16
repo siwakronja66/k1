@@ -770,7 +770,8 @@ function init3DScene() {
 
     renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     renderer.setSize(w, h);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const isMobileViewport = (window.innerWidth < 768) || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobileViewport ? 1.5 : 2));
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -788,8 +789,10 @@ function init3DScene() {
     const sunLight = new THREE.DirectionalLight(0xfffbeb, 1.25);
     sunLight.position.set(35, 55, 28);
     sunLight.castShadow = true;
-    sunLight.shadow.mapSize.width = 2048;
-    sunLight.shadow.mapSize.height = 2048;
+    const shadowRes = isMobileViewport ? 1024 : 2048;
+    sunLight.shadow.mapSize.width = shadowRes;
+    sunLight.shadow.mapSize.height = shadowRes;
+    sunLight.shadow.bias = -0.0004;
     sunLight.shadow.camera.near = 5;
     sunLight.shadow.camera.far = 160;
     const d = 45;
@@ -972,7 +975,8 @@ function buildCompoundEnvironment() {
         const curb = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.24, length), curbMat);
         curb.position.set(x, 0.14, z);
         curb.rotation.y = rotY;
-        curb.castShadow = true;
+        curb.castShadow = false;
+        curb.receiveShadow = true;
         envGroup.add(curb);
     }
     // West Curb (facing west entrance driveway)
@@ -1306,7 +1310,7 @@ function buildCompoundEnvironment() {
         const hedge = new THREE.Mesh(new THREE.DodecahedronGeometry(hp.r, 1), hedgeMat);
         hedge.position.set(hp.x, hp.r * 0.85 + 0.08, hp.z);
         hedge.scale.set(1.15, 0.85, 1.15);
-        hedge.castShadow = true;
+        hedge.castShadow = false;
         hedge.receiveShadow = true;
         envGroup.add(hedge);
     });
@@ -1318,7 +1322,7 @@ function buildCompoundEnvironment() {
         new THREE.MeshStandardMaterial({ color: 0xf8fafc, metalness: 0.85, roughness: 0.2 })
     );
     flagPole.position.set(-1.6, 5.75, 25.2);
-    flagPole.castShadow = true;
+    flagPole.castShadow = false;
     const flagGoldBall = new THREE.Mesh(new THREE.SphereGeometry(0.14, 8, 8), new THREE.MeshStandardMaterial({ color: 0xfacc15, metalness: 0.8 }));
     flagGoldBall.position.set(-1.6, 11.6, 25.2);
     const thaiFlagMat = new THREE.MeshBasicMaterial({ map: REAL_TEXTURES.thaiFlag, side: THREE.DoubleSide });
@@ -1492,7 +1496,7 @@ function createCampusTree(height = 5.5, canopyRadius = 2.4, color = 0x15803d) {
         trunkMat
     );
     trunk.position.y = height * 0.225;
-    trunk.castShadow = true;
+    trunk.castShadow = false;
     trunk.receiveShadow = true;
     tree.add(trunk);
 
@@ -1970,7 +1974,7 @@ function buildRealisticFloorExterior(bld, floor) {
                 [-1.5, 0.9].forEach(acOffset => {
                     const acUnit = new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.68, 0.42), acBoxMat);
                     acUnit.position.set(nbx + acOffset, 0.55, -d / 2 - 0.28);
-                    acUnit.castShadow = true;
+                    acUnit.castShadow = false;
                     shell.add(acUnit);
                 });
             });
@@ -2478,7 +2482,7 @@ function buildBuildingRoof(bld) {
             new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.75, roughness: 0.35 })
         );
         pergola.position.set(w / 2 - 2.4, 1.6, -d / 2 - 1.2);
-        pergola.castShadow = true;
+        pergola.castShadow = false;
         rGroup.add(pergola);
 
         // Rooftop AC Mechanical Screen & Chiller Units
@@ -2486,7 +2490,7 @@ function buildBuildingRoof(bld) {
         [-4.5, 0.0, 4.0].forEach(rx => {
             const chiller = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.1, 0.9), chillerMat);
             chiller.position.set(rx, 2.1, -1.5);
-            chiller.castShadow = true;
+            chiller.castShadow = false;
             rGroup.add(chiller);
         });
     } else if (bld.id === 'TTM') {
@@ -3492,6 +3496,17 @@ function toggleLeftPanel(forceState) {
 }
 
 window.toggleLeftPanel = toggleLeftPanel;
+
+function toggleMobileSpotsModal(forceState) {
+    const modal = document.getElementById('mobile-spots-modal');
+    if (!modal) return;
+    if (typeof forceState === 'boolean') {
+        modal.classList.toggle('hidden', !forceState);
+    } else {
+        modal.classList.toggle('hidden');
+    }
+}
+window.toggleMobileSpotsModal = toggleMobileSpotsModal;
 
 function toggleRoomDetailBody(forceState) {
     const body = document.getElementById('room-detail-body');

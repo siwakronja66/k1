@@ -202,7 +202,7 @@
         }
     </style>
     <script src="vendor/three.min.js" defer></script>
-    <script src="js/app.js?v=20261113L" defer></script>
+    <script src="js/app.js?v=20261116A" defer></script>
 </head>
 <body class="bg-slate-950 text-slate-100 h-screen flex flex-col overflow-hidden">
 
@@ -380,6 +380,14 @@
                     title="เปิดแถบข้อมูลห้องและค้นหา" data-i18n-title="sidebar.open">
                 <i class="fa-solid fa-angles-left"></i>
                 <span data-i18n="sidebar.open">เปิดข้อมูลห้อง & ค้นหา</span>
+            </button>
+
+            <!-- Mobile Floating Button: Photo Spots & Executive Modal Trigger -->
+            <button type="button" onclick="toggleMobileSpotsModal(true)" id="btn-mobile-spots"
+                    class="md:hidden absolute top-3 left-3 z-20 bg-slate-900/95 hover:bg-slate-800 text-emerald-300 hover:text-white font-heading font-semibold text-xs px-3 py-2 rounded-xl shadow-2xl border border-emerald-500/40 flex items-center gap-1.5 backdrop-blur-md cursor-pointer pointer-events-auto transition active:scale-95"
+                    title="ดูภาพสถานที่จริง 11 จุด และข้อมูลผู้บริหาร">
+                <i class="fa-solid fa-camera-retro text-amber-400"></i>
+                <span>ภาพจริง 11 จุด & ผู้บริหาร</span>
             </button>
 
             <!-- LEFT FLOATING OVERLAY: Executive Card + 8 Real Photo Spots -->
@@ -659,6 +667,122 @@
                 <div id="directory-list" class="flex-1 overflow-y-auto p-2.5 space-y-1.5 min-h-0 rounded-b-2xl"></div>
             </div>
         </aside>
+    </div>
+
+    <!-- ================= MOBILE MODAL: Photo Spots & Executive ================= -->
+    <div id="mobile-spots-modal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex flex-col justify-end md:hidden">
+        <!-- Click outside backdrop to close -->
+        <div class="flex-1" onclick="toggleMobileSpotsModal(false)"></div>
+        <div class="bg-slate-900 border-t border-emerald-500/40 rounded-t-3xl p-4 max-h-[85vh] overflow-y-auto shadow-2xl flex flex-col gap-3.5">
+            <!-- Header with Title & Close Button -->
+            <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-camera-retro"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-heading font-bold text-white">จุดเทียบภาพจริง & ผู้บริหาร</h3>
+                        <p class="text-[10px] text-slate-400">แตะเพื่อดูภาพและปรับมุมกล้อง 3D</p>
+                    </div>
+                </div>
+                <button type="button" onclick="toggleMobileSpotsModal(false)" class="text-slate-400 hover:text-white px-2.5 py-1 rounded-xl bg-slate-800 border border-slate-700 text-xs font-heading flex items-center gap-1 cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i> <span>ปิด</span>
+                </button>
+            </div>
+
+            <!-- Mobile Executive Card (Dr. Narong) -->
+            <div class="bg-slate-950/90 rounded-2xl p-3 border border-emerald-500/30 flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl overflow-hidden bg-slate-800 border border-emerald-500/40 flex items-center justify-center shrink-0">
+                    <img src="assets/dr-Narong3.png" alt="นพ.ณรงค์ จันทร์แก้ว" class="w-full h-full object-cover"
+                         onerror="this.onerror=null; this.src='assets/icon.svg';">
+                </div>
+                <div class="min-w-0 flex-1">
+                    <span class="inline-block text-[9px] font-heading font-semibold uppercase px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                        ผู้บริหารสูงสุด
+                    </span>
+                    <h4 class="text-xs font-heading font-bold text-white truncate mt-0.5">นพ.ณรงค์ จันทร์แก้ว</h4>
+                    <p class="text-[10px] text-emerald-300 truncate">นายแพทย์สาธารณสุขจังหวัดมุกดาหาร</p>
+                </div>
+                <button onclick="focusRoom3D('R431'); toggleMobileSpotsModal(false);" class="text-[10px] font-heading font-medium bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1.5 rounded-lg shadow shrink-0 flex items-center gap-1 cursor-pointer">
+                    <i class="fa-solid fa-location-crosshairs"></i> ห้องทำงาน
+                </button>
+            </div>
+
+            <!-- 11 Real Photo Spots Grid -->
+            <div>
+                <div class="flex items-center justify-between text-xs font-heading font-semibold text-emerald-300 mb-2">
+                    <span><i class="fa-solid fa-camera-retro text-amber-400 mr-1"></i>จุดเทียบภาพจริง 11 จุด</span>
+                    <button onclick="focusBackExitRoute(); toggleMobileSpotsModal(false);" class="bg-lime-500 hover:bg-lime-400 text-slate-950 font-bold px-2 py-0.5 rounded text-[10px] cursor-pointer" title="ดูเส้นทางประตูหลัง OSSC">
+                        <i class="fa-solid fa-torii-gate mr-0.5"></i>ประตูหลัง OSSC
+                    </button>
+                </div>
+                <div class="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-0.5">
+                    <button onclick="inspectRealPhotoSpot(0); toggleMobileSpotsModal(false);" class="group relative rounded-xl overflow-hidden border border-emerald-400/60 text-left bg-slate-950 cursor-pointer">
+                        <img src="assets/20854.jpg" alt="ตึก 4F" loading="lazy" decoding="async" class="w-full h-12 object-cover group-hover:scale-105 transition" onerror="this.src='assets/icon.svg';">
+                        <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-emerald-200 truncate">📸 1. ตึก 4F & ใต้ถุน</div>
+                    </button>
+                    <button onclick="inspectRealPhotoSpot(1); toggleMobileSpotsModal(false);" class="group relative rounded-xl overflow-hidden border border-sky-400/60 text-left bg-slate-950 cursor-pointer">
+                        <img src="assets/20863.jpg" alt="ป้าย OSSC" loading="lazy" decoding="async" class="w-full h-12 object-cover group-hover:scale-105 transition" onerror="this.src='assets/icon.svg';">
+                        <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-sky-200 truncate">📸 2. ป้าย OSSC & รั้ว</div>
+                    </button>
+                    <button onclick="inspectRealPhotoSpot(2); toggleMobileSpotsModal(false);" class="group relative rounded-xl overflow-hidden border border-amber-400/60 text-left bg-slate-950 cursor-pointer">
+                        <img src="assets/20855.jpg" alt="ซุ้ม OSSC" loading="lazy" decoding="async" class="w-full h-12 object-cover group-hover:scale-105 transition" onerror="this.src='assets/icon.svg';">
+                        <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-amber-200 truncate">📸 3. ซุ้ม OSSC & ดื่มไม่ขับ</div>
+                    </button>
+                    <button onclick="inspectRealPhotoSpot(3); toggleMobileSpotsModal(false);" class="group relative rounded-xl overflow-hidden border border-lime-400/60 text-left bg-slate-950 cursor-pointer">
+                        <img src="assets/20847.jpg" alt="ทางเชื่อมชั้น 2" loading="lazy" decoding="async" class="w-full h-12 object-cover group-hover:scale-105 transition" onerror="this.src='assets/icon.svg';">
+                        <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-lime-200 truncate">📸 4. ทางเชื่อมชั้น 2</div>
+                    </button>
+                    <button onclick="inspectRealPhotoSpot(4); toggleMobileSpotsModal(false);" class="group relative rounded-xl overflow-hidden border border-teal-400/60 text-left bg-slate-950 cursor-pointer">
+                        <img src="assets/20858.jpg" alt="เสาเขียว 4F" loading="lazy" decoding="async" class="w-full h-12 object-cover group-hover:scale-105 transition" onerror="this.src='assets/icon.svg';">
+                        <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-teal-200 truncate">📸 5. เสาเขียว 4F</div>
+                    </button>
+                    <button onclick="inspectRealPhotoSpot(5); toggleMobileSpotsModal(false);" class="group relative rounded-xl overflow-hidden border border-yellow-400/60 text-left bg-slate-950 cursor-pointer">
+                        <img src="assets/20846.jpg" alt="ทางออกหลัง" loading="lazy" decoding="async" class="w-full h-12 object-cover group-hover:scale-105 transition" onerror="this.src='assets/icon.svg';">
+                        <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-yellow-200 truncate">📸 6. ทางออกหลัง</div>
+                    </button>
+                    <button onclick="inspectRealPhotoSpot(6); toggleMobileSpotsModal(false);" class="group relative rounded-xl overflow-hidden border border-rose-400/60 text-left bg-slate-950 cursor-pointer">
+                        <img src="assets/20261109_163722.jpg" alt="หน้าต่าง 3 ช่อง" loading="lazy" decoding="async" class="w-full h-12 object-cover group-hover:scale-105 transition" onerror="this.src='assets/icon.svg';">
+                        <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-rose-200 truncate">📸 7. หน้าต่าง 3 ช่อง</div>
+                    </button>
+                    <button onclick="inspectRealPhotoSpot(7); toggleMobileSpotsModal(false);" class="group relative rounded-xl overflow-hidden border border-blue-400/60 text-left bg-slate-950 cursor-pointer">
+                        <img src="assets/20261109_163704.jpg" alt="แพทย์แผนไทย" loading="lazy" decoding="async" class="w-full h-12 object-cover group-hover:scale-105 transition" onerror="this.src='assets/icon.svg';">
+                        <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-blue-200 truncate">📸 8. แพทย์แผนไทย</div>
+                    </button>
+                    <button onclick="inspectRealPhotoSpot(8); toggleMobileSpotsModal(false);" class="group relative rounded-xl overflow-hidden border border-sky-400/60 text-left bg-slate-950 cursor-pointer">
+                        <img src="assets/f122.jpg" alt="ตึก 1 & ซุ้มมุข" loading="lazy" decoding="async" class="w-full h-12 object-cover group-hover:scale-105 transition" onerror="this.src='assets/icon.svg';">
+                        <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-sky-200 truncate">📸 9. ตึก 1 & ซุ้มมุข</div>
+                    </button>
+                    <button onclick="inspectRealPhotoSpot(9); toggleMobileSpotsModal(false);" class="group relative rounded-xl overflow-hidden border border-amber-400/60 text-left bg-slate-950 cursor-pointer">
+                        <img src="assets/f12.jpg" alt="หอพระ" loading="lazy" decoding="async" class="w-full h-12 object-cover group-hover:scale-105 transition" onerror="this.src='assets/icon.svg';">
+                        <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-amber-200 truncate">📸 10. หอพระ & ลานจอด</div>
+                    </button>
+                    <button onclick="inspectRealPhotoSpot(10); toggleMobileSpotsModal(false);" class="group relative rounded-xl overflow-hidden border border-cyan-400/60 text-left bg-slate-950 cursor-pointer">
+                        <img src="assets/f1.jpg" alt="ปีกอาคาร" loading="lazy" decoding="async" class="w-full h-12 object-cover group-hover:scale-105 transition" onerror="this.src='assets/icon.svg';">
+                        <div class="absolute inset-x-0 bottom-0 bg-slate-950/85 px-1.5 py-0.5 text-[9px] font-heading text-cyan-200 truncate">📸 11. ปีกอาคาร & สวน</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Satellite Map Controls -->
+            <div class="flex items-center justify-between bg-slate-950/90 p-2.5 rounded-2xl border border-slate-700">
+                <div class="flex items-center gap-2">
+                    <img src="assets/satellite-4f.jpg" alt="ดาวเทียม" loading="lazy" class="w-9 h-9 rounded-xl object-cover border border-emerald-500/40">
+                    <div class="text-[10px]">
+                        <div class="font-heading font-semibold text-white">แผนที่ดาวเทียมจริง</div>
+                        <div class="text-slate-400">ซ้อนพื้นแผนที่ 3D</div>
+                    </div>
+                </div>
+                <div class="flex gap-1.5">
+                    <button onclick="toggleSatelliteGround(); toggleMobileSpotsModal(false);" class="bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30 px-2.5 py-1.5 rounded-xl text-[10px] font-heading cursor-pointer">
+                        พื้นแผนที่
+                    </button>
+                    <button onclick="setTopDownSatelliteView(); toggleMobileSpotsModal(false);" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 px-2.5 py-1.5 rounded-xl text-[10px] font-heading cursor-pointer">
+                        มุมบน 90°
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
 </body>
