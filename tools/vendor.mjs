@@ -13,6 +13,7 @@ mkdirSync(out + 'fonts', { recursive: true });
 mkdirSync(out + 'fontawesome/css', { recursive: true });
 
 cpSync(nm + 'three/build/three.min.js', out + 'three.min.js');
+cpSync(nm + 'three/examples/js/loaders/GLTFLoader.js', out + 'GLTFLoader.js');
 cpSync(nm + 'qrcode-generator/qrcode.js', out + 'qrcode.js');
 
 // Font Awesome: css + woff2 only (ttf fallbacks dropped from CSS below)

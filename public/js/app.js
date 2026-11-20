@@ -806,6 +806,7 @@ function init3DScene() {
     buildCompoundEnvironment();
     buildAllBuildings3D();
     buildSkybridge2Fto4F();
+    loadRealisticBld4FModel();
     buildHTMLPins();
     setupMouseTouchControls();
 
@@ -2626,6 +2627,172 @@ function buildSkybridge2Fto4F() {
     scene.add(skybridgeGroup);
 }
 
+// ============================================================================
+// REALISTIC BLENDER MODEL INTEGRATION FOR BUILDING 2 (4F)
+// ============================================================================
+let bld4fGlbGroup = null;
+let bld4fGlbFloors = { 1: null, 2: null, 3: null, 4: null };
+let bld4fGlbRoof = null;
+let bld4fGlbShell = null;
+let bld4fGlbCore = null;
+let bld4fGlbLoaded = false;
+
+function loadRealisticBld4FModel() {
+    if (typeof THREE.GLTFLoader === 'undefined') {
+        console.warn('GLTFLoader not available, using procedural 4F building.');
+        return;
+    }
+
+    const loader = new THREE.GLTFLoader();
+    loader.load('assets/bld4f_model.glb', (gltf) => {
+        bld4fGlbGroup = new THREE.Group();
+        bld4fGlbGroup.name = 'Bld4F_Realistic_Blender_Model';
+
+        bld4fGlbFloors = {
+            1: new THREE.Group(),
+            2: new THREE.Group(),
+            3: new THREE.Group(),
+            4: new THREE.Group()
+        };
+        bld4fGlbRoof = new THREE.Group();
+        bld4fGlbShell = new THREE.Group();
+        bld4fGlbCore = new THREE.Group();
+
+        bld4fGlbFloors[1].name = 'GLB_Floor_1';
+        bld4fGlbFloors[2].name = 'GLB_Floor_2';
+        bld4fGlbFloors[3].name = 'GLB_Floor_3';
+        bld4fGlbFloors[4].name = 'GLB_Floor_4';
+        bld4fGlbRoof.name = 'GLB_Roof';
+        bld4fGlbShell.name = 'GLB_Shell';
+        bld4fGlbCore.name = 'GLB_Core';
+
+        const children = [...gltf.scene.children];
+        children.forEach(child => {
+            const name = child.name;
+
+            child.traverse(obj => {
+                if (obj.isMesh) {
+                    obj.castShadow = true;
+                    obj.receiveShadow = true;
+                    if (obj.material) {
+                        const mName = obj.material.name || '';
+                        if (mName.includes('Glass')) {
+                            obj.material.transparent = true;
+                            obj.material.opacity = mName.includes('Frosted') ? 0.6 : 0.35;
+                            obj.material.roughness = 0.1;
+                            obj.material.side = THREE.DoubleSide;
+                        }
+                    }
+
+                    // Map Blender rooms to room database
+                    let targetRoomId = null;
+                    if (name.includes('WangThianMekHall')) targetRoomId = 'R443';
+                    else if (name.includes('EOC_Center')) targetRoomId = 'R441';
+                    else if (name.includes('OSSC')) targetRoomId = 'R411';
+                    else if (name.includes('HealthInsurance')) targetRoomId = 'R412';
+                    else if (name.includes('NCD_Control')) targetRoomId = 'R423';
+                    else if (name.includes('HealthPromo')) targetRoomId = 'R421';
+                    else if (name.includes('Communicable')) targetRoomId = 'R422';
+                    else if (name.includes('HR_Management')) targetRoomId = 'R433';
+                    else if (name.includes('EnvOccHealth')) targetRoomId = 'R442';
+
+                    if (targetRoomId) {
+                        const roomData = ROOMS_DB.find(r => r.id === targetRoomId);
+                        if (roomData) {
+                            obj.userData = { roomId: targetRoomId, roomData: roomData };
+                            roomMeshes.push(obj);
+                        }
+                    }
+                }
+            });
+
+            if (name.startsWith('F1_') || name.startsWith('Floor1_') || name.startsWith('Label_F1_')) {
+                bld4fGlbFloors[1].add(child);
+            } else if (name.startsWith('F2_') || name.startsWith('Floor2_') || name.startsWith('Label_F2_')) {
+                bld4fGlbFloors[2].add(child);
+            } else if (name.startsWith('F3_') || name.startsWith('Floor3_') || name.startsWith('Label_F3_')) {
+                bld4fGlbFloors[3].add(child);
+            } else if (name.startsWith('F4_') || name.startsWith('Floor4_') || name.startsWith('Label_F4_')) {
+                bld4fGlbFloors[4].add(child);
+            } else if (name.includes('Roof') || name === 'Ext_08_Roof_Corrugated_Sheets') {
+                bld4fGlbRoof.add(child);
+            } else if (name.startsWith('Ext_')) {
+                bld4fGlbShell.add(child);
+            } else if (name.includes('Core')) {
+                bld4fGlbCore.add(child);
+            } else {
+                bld4fGlbGroup.add(child);
+            }
+        });
+
+        bld4fGlbGroup.add(bld4fGlbFloors[1]);
+        bld4fGlbGroup.add(bld4fGlbFloors[2]);
+        bld4fGlbGroup.add(bld4fGlbFloors[3]);
+        bld4fGlbGroup.add(bld4fGlbFloors[4]);
+        bld4fGlbGroup.add(bld4fGlbRoof);
+        bld4fGlbGroup.add(bld4fGlbShell);
+        bld4fGlbGroup.add(bld4fGlbCore);
+
+        // Position: Building 4F center (-3.2, 0, -8.2)
+        bld4fGlbGroup.position.set(-3.2, 0, -8.2);
+        bld4fGlbGroup.rotation.y = Math.PI;
+
+        scene.add(bld4fGlbGroup);
+        bld4fGlbLoaded = true;
+
+        // Hide procedural 4F exterior shell & roof to show realistic model cleanly
+        exteriorShells.forEach(s => {
+            if (s.userData && s.userData.buildingId === '4F') {
+                s.visible = false;
+            }
+        });
+        if (roofGroups['4F']) {
+            roofGroups['4F'].visible = false;
+        }
+
+        updateBld4fGlbVisibility();
+        if (typeof requestRender === 'function') requestRender();
+        console.log('[3D] Realistic Building 4F Blender Model integrated successfully!');
+    }, undefined, (err) => {
+        console.error('[3D] Failed to load bld4f_model.glb:', err);
+    });
+}
+
+function updateBld4fGlbVisibility() {
+    if (!bld4fGlbLoaded || !bld4fGlbGroup) return;
+
+    const floorNum = (currentFloorFilter === 'ALL') ? 99 : parseInt(currentFloorFilter, 10);
+
+    // Floor visibility
+    [1, 2, 3, 4].forEach(f => {
+        if (bld4fGlbFloors[f]) {
+            bld4fGlbFloors[f].visible = (currentFloorFilter === 'ALL' || f <= floorNum);
+            // Explode elevation
+            bld4fGlbFloors[f].position.y = (f - 1) * (explodeFactor * 2.5);
+        }
+    });
+
+    // Roof visibility
+    if (bld4fGlbRoof) {
+        bld4fGlbRoof.visible = (currentFloorFilter === 'ALL' && currentExteriorMode === 'realistic');
+        bld4fGlbRoof.position.y = 4 * (explodeFactor * 2.5);
+    }
+
+    // Shell visibility
+    if (bld4fGlbShell) {
+        if (currentExteriorMode === 'interior' || currentFloorFilter !== 'ALL') {
+            bld4fGlbShell.visible = false;
+        } else {
+            bld4fGlbShell.visible = true;
+        }
+    }
+
+    // Core visibility (stairs & elevator)
+    if (bld4fGlbCore) {
+        bld4fGlbCore.visible = true;
+    }
+}
+
 function createSimpleCarMesh(colorHex) {
     const g = new THREE.Group();
     const bodyMat = new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.25, metalness: 0.35 });
@@ -2940,6 +3107,10 @@ function setExteriorMode(mode) {
     });
 
     exteriorShells.forEach(shell => {
+        if (bld4fGlbLoaded && shell.userData && shell.userData.buildingId === '4F') {
+            shell.visible = false;
+            return;
+        }
         if (mode === 'realistic') {
             shell.visible = true;
         } else if (mode === 'hybrid') {
@@ -2950,6 +3121,10 @@ function setExteriorMode(mode) {
     });
 
     Object.values(roofGroups).forEach(r => {
+        if (bld4fGlbLoaded && r === roofGroups['4F']) {
+            r.visible = false;
+            return;
+        }
         r.visible = (mode === 'realistic' && currentFloorFilter === 'ALL');
     });
 
@@ -2958,6 +3133,8 @@ function setExteriorMode(mode) {
         const matchFloor = (currentFloorFilter === 'ALL' || rFloor === currentFloorFilter);
         rm.visible = (mode !== 'realistic') && matchFloor;
     });
+
+    updateBld4fGlbVisibility();
 }
 
 function toggleFloorDropdown() {
@@ -3033,6 +3210,10 @@ function select3DFloor(floor) {
     });
 
     Object.values(roofGroups).forEach(r => {
+        if (bld4fGlbLoaded && r === roofGroups['4F']) {
+            r.visible = false;
+            return;
+        }
         r.visible = (floor === 'ALL' && currentExteriorMode === 'realistic');
     });
 
@@ -3041,6 +3222,7 @@ function select3DFloor(floor) {
         rm.visible = (currentExteriorMode !== 'realistic') && (floor === 'ALL' || rFloor === floor);
     });
 
+    updateBld4fGlbVisibility();
     renderDirectoryList();
 }
 
@@ -3059,6 +3241,7 @@ function handleExplodeSlider(val) {
     if (skybridgeGroup) {
         skybridgeGroup.position.y = BASE_FLOOR_HEIGHT + explodeFactor * 2.5;
     }
+    updateBld4fGlbVisibility();
 }
 
 function renderBuildingFocusButtons() {
