@@ -2636,6 +2636,62 @@ let bld4fGlbRoof = null;
 let bld4fGlbShell = null;
 let bld4fGlbCore = null;
 let bld4fGlbLoaded = false;
+let currentBld4fModelMode = 'original'; // Default: original clean model as requested
+
+function setBld4fModelMode(mode) {
+    currentBld4fModelMode = mode;
+    const isBlender = (mode === 'blender');
+
+    const btnOrig = document.getElementById('btn-bld4f-orig');
+    const btnBlend = document.getElementById('btn-bld4f-blend');
+    if (btnOrig) {
+        btnOrig.className = !isBlender
+            ? 'px-2 py-1 rounded-lg text-xs font-heading font-semibold bg-emerald-600 text-white shadow flex items-center gap-1 transition cursor-pointer'
+            : 'px-2 py-1 rounded-lg text-xs font-heading font-semibold text-slate-300 hover:bg-slate-800 hover:text-white flex items-center gap-1 transition cursor-pointer';
+    }
+    if (btnBlend) {
+        btnBlend.className = isBlender
+            ? 'px-2 py-1 rounded-lg text-xs font-heading font-semibold bg-emerald-600 text-white shadow flex items-center gap-1 transition cursor-pointer'
+            : 'px-2 py-1 rounded-lg text-xs font-heading font-semibold text-slate-300 hover:bg-slate-800 hover:text-white flex items-center gap-1 transition cursor-pointer';
+    }
+
+    if (bld4fGlbGroup) {
+        bld4fGlbGroup.visible = isBlender;
+    }
+
+    // Toggle procedural skybridge (keep only when original is active, hide when blender is active)
+    if (skybridgeGroup) {
+        skybridgeGroup.visible = !isBlender;
+    }
+
+    // Toggle procedural 4F exterior shells
+    exteriorShells.forEach(s => {
+        if (s.userData && s.userData.buildingId === '4F') {
+            s.visible = !isBlender && (currentExteriorMode !== 'interior');
+        }
+    });
+
+    // Toggle procedural 4F roof
+    if (roofGroups['4F']) {
+        roofGroups['4F'].visible = !isBlender && (currentExteriorMode === 'realistic' && currentFloorFilter === 'ALL');
+    }
+
+    // Toggle procedural 4F floor slabs
+    if (floorGroups['4F']) {
+        Object.keys(floorGroups['4F']).forEach(fNum => {
+            const fg = floorGroups['4F'][fNum];
+            if (fg && fg.children && fg.children[0]) {
+                fg.children[0].visible = !isBlender;
+            }
+        });
+    }
+
+    if (isBlender) {
+        updateBld4fGlbVisibility();
+    }
+    if (typeof requestRender === 'function') requestRender();
+}
+window.setBld4fModelMode = setBld4fModelMode;
 
 function loadRealisticBld4FModel() {
     if (typeof THREE.GLTFLoader === 'undefined') {
@@ -2740,19 +2796,11 @@ function loadRealisticBld4FModel() {
         scene.add(bld4fGlbGroup);
         bld4fGlbLoaded = true;
 
-        // Hide procedural 4F exterior shell & roof to show realistic model cleanly
-        exteriorShells.forEach(s => {
-            if (s.userData && s.userData.buildingId === '4F') {
-                s.visible = false;
-            }
-        });
-        if (roofGroups['4F']) {
-            roofGroups['4F'].visible = false;
-        }
+        // Apply current active model mode (defaults to 'original')
+        setBld4fModelMode(currentBld4fModelMode);
 
-        updateBld4fGlbVisibility();
         if (typeof requestRender === 'function') requestRender();
-        console.log('[3D] Realistic Building 4F Blender Model integrated successfully!');
+        console.log('[3D] Realistic Building 4F Blender Model loaded (ready in background)!');
     }, undefined, (err) => {
         console.error('[3D] Failed to load bld4f_model.glb:', err);
     });
@@ -2760,6 +2808,11 @@ function loadRealisticBld4FModel() {
 
 function updateBld4fGlbVisibility() {
     if (!bld4fGlbLoaded || !bld4fGlbGroup) return;
+    if (currentBld4fModelMode !== 'blender') {
+        bld4fGlbGroup.visible = false;
+        return;
+    }
+    bld4fGlbGroup.visible = true;
 
     const floorNum = (currentFloorFilter === 'ALL') ? 99 : parseInt(currentFloorFilter, 10);
 
@@ -3107,7 +3160,7 @@ function setExteriorMode(mode) {
     });
 
     exteriorShells.forEach(shell => {
-        if (bld4fGlbLoaded && shell.userData && shell.userData.buildingId === '4F') {
+        if (currentBld4fModelMode === 'blender' && bld4fGlbLoaded && shell.userData && shell.userData.buildingId === '4F') {
             shell.visible = false;
             return;
         }
@@ -3121,7 +3174,7 @@ function setExteriorMode(mode) {
     });
 
     Object.values(roofGroups).forEach(r => {
-        if (bld4fGlbLoaded && r === roofGroups['4F']) {
+        if (currentBld4fModelMode === 'blender' && bld4fGlbLoaded && r === roofGroups['4F']) {
             r.visible = false;
             return;
         }
@@ -3210,7 +3263,7 @@ function select3DFloor(floor) {
     });
 
     Object.values(roofGroups).forEach(r => {
-        if (bld4fGlbLoaded && r === roofGroups['4F']) {
+        if (currentBld4fModelMode === 'blender' && bld4fGlbLoaded && r === roofGroups['4F']) {
             r.visible = false;
             return;
         }
