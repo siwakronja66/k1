@@ -191,6 +191,9 @@ let satellitePlane = null;
 let skyDomeMesh = null;
 let trafficArrowMeshes = [];
 let htmlPins = [];
+let envGroup = null;
+let siteGroundGroup = null;
+let siteGroundLoaded = false;
 
 const BASE_FLOOR_HEIGHT = 3.6;
 let currentFloorFilter = 'ALL';
@@ -807,6 +810,7 @@ function init3DScene() {
     buildAllBuildings3D();
     buildSkybridge2Fto4F();
     loadRealisticBld4FModel();
+    loadSiteGroundModel();
     buildHTMLPins();
     setupMouseTouchControls();
 
@@ -852,7 +856,7 @@ function createAfternoonSkyDome() {
 }
 
 function buildCompoundEnvironment() {
-    const envGroup = new THREE.Group();
+    envGroup = new THREE.Group();
 
     // Base Compound Ground (Neutral perimeter for horizon blend)
     const baseGround = new THREE.Mesh(
@@ -2655,43 +2659,82 @@ function setBld4fModelMode(mode) {
             : 'px-2 py-1 rounded-lg text-xs font-heading font-semibold text-slate-300 hover:bg-slate-800 hover:text-white flex items-center gap-1 transition cursor-pointer';
     }
 
+    // Toggle Site Ground (Blender ground vs procedural environment)
+    if (siteGroundGroup) {
+        siteGroundGroup.visible = isBlender;
+    }
+    if (envGroup) {
+        envGroup.visible = !isBlender;
+    }
+
     if (bld4fGlbGroup) {
         bld4fGlbGroup.visible = isBlender;
     }
 
-    // Toggle procedural skybridge (keep only when original is active, hide when blender is active)
+    // Toggle procedural skybridge
     if (skybridgeGroup) {
         skybridgeGroup.visible = !isBlender;
     }
 
-    // Toggle procedural 4F exterior shells
-    exteriorShells.forEach(s => {
-        if (s.userData && s.userData.buildingId === '4F') {
-            s.visible = !isBlender && (currentExteriorMode !== 'interior');
-        }
-    });
-
-    // Toggle procedural 4F roof
-    if (roofGroups['4F']) {
-        roofGroups['4F'].visible = !isBlender && (currentExteriorMode === 'realistic' && currentFloorFilter === 'ALL');
-    }
-
-    // Toggle procedural 4F floor slabs
-    if (floorGroups['4F']) {
-        Object.keys(floorGroups['4F']).forEach(fNum => {
-            const fg = floorGroups['4F'][fNum];
-            if (fg && fg.children && fg.children[0]) {
-                fg.children[0].visible = !isBlender;
+    // Toggle procedural buildings (hide procedural when Blender mode is active)
+    Object.keys(floorGroups).forEach(bId => {
+        Object.keys(floorGroups[bId]).forEach(fNum => {
+            const fg = floorGroups[bId][fNum];
+            if (fg) {
+                fg.visible = !isBlender && (currentFloorFilter === 'ALL' || parseInt(fNum, 10) <= parseInt(currentFloorFilter, 10));
             }
         });
-    }
+    });
+
+    // Toggle procedural exterior shells
+    exteriorShells.forEach(s => {
+        s.visible = !isBlender && (currentExteriorMode !== 'interior');
+    });
+
+    // Toggle procedural roofs
+    Object.values(roofGroups).forEach(r => {
+        r.visible = !isBlender && (currentExteriorMode === 'realistic' && currentFloorFilter === 'ALL');
+    });
 
     if (isBlender) {
         updateBld4fGlbVisibility();
+        camTargetState.radius = 65;
+        camTargetState.theta = 0.45;
+        camTargetState.phi = 1.05;
+        camTargetState.target.set(-10, 3.5, -20);
+    } else {
+        camTargetState.radius = 44;
+        camTargetState.theta = 0.48;
+        camTargetState.phi = 1.05;
+        camTargetState.target.set(0, 3.2, -2.5);
     }
     if (typeof requestRender === 'function') requestRender();
 }
 window.setBld4fModelMode = setBld4fModelMode;
+
+function loadSiteGroundModel() {
+    if (typeof THREE.GLTFLoader === 'undefined') return;
+    const loader = new THREE.GLTFLoader();
+    loader.load('assets/site_ground.glb', (gltf) => {
+        siteGroundGroup = gltf.scene;
+        siteGroundGroup.name = 'Site_Ground_Blender_Model';
+        siteGroundGroup.traverse(child => {
+            if (child.isMesh) {
+                child.receiveShadow = true;
+                if (child.name && child.name.startsWith('Ground_09_Fences')) {
+                    child.castShadow = true;
+                }
+            }
+        });
+        scene.add(siteGroundGroup);
+        siteGroundLoaded = true;
+        siteGroundGroup.visible = (currentBld4fModelMode === 'blender');
+        if (typeof requestRender === 'function') requestRender();
+        console.log('[3D] Realistic Site Ground Blender Model loaded!');
+    }, undefined, (err) => {
+        console.error('[3D] Failed to load site_ground.glb:', err);
+    });
+}
 
 function loadRealisticBld4FModel() {
     if (typeof THREE.GLTFLoader === 'undefined') {
@@ -2789,8 +2832,8 @@ function loadRealisticBld4FModel() {
         bld4fGlbGroup.add(bld4fGlbShell);
         bld4fGlbGroup.add(bld4fGlbCore);
 
-        // Position: Building 4F center (-3.2, 0, -8.2)
-        bld4fGlbGroup.position.set(-3.2, 0, -8.2);
+        // Position: Building 4F center aligned with site_ground.glb Guide_bld_back_4f
+        bld4fGlbGroup.position.set(-22.5, 0.2, -37.6);
         bld4fGlbGroup.rotation.y = Math.PI;
 
         scene.add(bld4fGlbGroup);
@@ -2898,11 +2941,22 @@ function buildHTMLPins() {
             el,
             type: 'building',
             buildingId: bld.id,
-            getWorldPos: () => new THREE.Vector3(
-                bld.centerX,
-                bld.floors * BASE_FLOOR_HEIGHT + (bld.floors - 1) * explodeFactor * 2.2 + 2.4,
-                bld.centerZ
-            )
+            getWorldPos: () => {
+                if (currentBld4fModelMode === 'blender') {
+                    if (bld.id === '4F') {
+                        return new THREE.Vector3(-22.5, 16.5 + 4 * explodeFactor * 2.5, -37.6);
+                    } else if (bld.id === '2F') {
+                        return new THREE.Vector3(-15.0, 8.5 + 2 * explodeFactor * 2.5, -18.0);
+                    } else if (bld.id === 'TTM') {
+                        return new THREE.Vector3(22.0, 5.5, -42.3);
+                    }
+                }
+                return new THREE.Vector3(
+                    bld.centerX,
+                    bld.floors * BASE_FLOOR_HEIGHT + (bld.floors - 1) * explodeFactor * 2.2 + 2.4,
+                    bld.centerZ
+                );
+            }
         });
     });
 
@@ -2924,6 +2978,9 @@ function buildHTMLPins() {
         el: execEl,
         type: 'executive',
         getWorldPos: () => {
+            if (currentBld4fModelMode === 'blender') {
+                return new THREE.Vector3(-22.5, 12.0 + 2 * explodeFactor * 2.5, -34.5);
+            }
             const mesh = roomMeshMap['R431'];
             if (!mesh) return new THREE.Vector3(-11, 10, -8);
             const v = new THREE.Vector3();
@@ -3159,33 +3216,30 @@ function setExteriorMode(mode) {
         }
     });
 
-    exteriorShells.forEach(shell => {
-        if (currentBld4fModelMode === 'blender' && bld4fGlbLoaded && shell.userData && shell.userData.buildingId === '4F') {
-            shell.visible = false;
-            return;
-        }
-        if (mode === 'realistic') {
-            shell.visible = true;
-        } else if (mode === 'hybrid') {
-            shell.visible = true;
-        } else {
-            shell.visible = false;
-        }
-    });
+    if (currentBld4fModelMode === 'blender') {
+        exteriorShells.forEach(s => { s.visible = false; });
+        Object.values(roofGroups).forEach(r => { r.visible = false; });
+    } else {
+        exteriorShells.forEach(shell => {
+            if (mode === 'realistic' || mode === 'hybrid') {
+                shell.visible = true;
+            } else {
+                shell.visible = false;
+            }
+        });
 
-    Object.values(roofGroups).forEach(r => {
-        if (currentBld4fModelMode === 'blender' && bld4fGlbLoaded && r === roofGroups['4F']) {
-            r.visible = false;
-            return;
-        }
-        r.visible = (mode === 'realistic' && currentFloorFilter === 'ALL');
-    });
+        Object.values(roofGroups).forEach(r => {
+            r.visible = (mode === 'realistic' && currentFloorFilter === 'ALL');
+        });
 
-    roomMeshes.forEach(rm => {
-        const rFloor = rm.userData.roomData.floor;
-        const matchFloor = (currentFloorFilter === 'ALL' || rFloor === currentFloorFilter);
-        rm.visible = (mode !== 'realistic') && matchFloor;
-    });
+        roomMeshes.forEach(rm => {
+            if (rm.userData && rm.userData.roomData) {
+                const rFloor = rm.userData.roomData.floor;
+                const matchFloor = (currentFloorFilter === 'ALL' || rFloor === currentFloorFilter);
+                rm.visible = (mode !== 'realistic') && matchFloor;
+            }
+        });
+    }
 
     updateBld4fGlbVisibility();
 }
@@ -3254,26 +3308,34 @@ function select3DFloor(floor) {
         setExteriorMode('interior');
     }
 
-    Object.keys(floorGroups).forEach(bId => {
-        Object.keys(floorGroups[bId]).forEach(fNum => {
-            const fg = floorGroups[bId][fNum];
-            const n = parseInt(fNum, 10);
-            fg.visible = (floor === 'ALL' || n <= floor);
+    if (currentBld4fModelMode === 'blender') {
+        Object.keys(floorGroups).forEach(bId => {
+            Object.keys(floorGroups[bId]).forEach(fNum => {
+                const fg = floorGroups[bId][fNum];
+                if (fg) fg.visible = false;
+            });
         });
-    });
+        Object.values(roofGroups).forEach(r => { r.visible = false; });
+    } else {
+        Object.keys(floorGroups).forEach(bId => {
+            Object.keys(floorGroups[bId]).forEach(fNum => {
+                const fg = floorGroups[bId][fNum];
+                const n = parseInt(fNum, 10);
+                fg.visible = (floor === 'ALL' || n <= floor);
+            });
+        });
 
-    Object.values(roofGroups).forEach(r => {
-        if (currentBld4fModelMode === 'blender' && bld4fGlbLoaded && r === roofGroups['4F']) {
-            r.visible = false;
-            return;
-        }
-        r.visible = (floor === 'ALL' && currentExteriorMode === 'realistic');
-    });
+        Object.values(roofGroups).forEach(r => {
+            r.visible = (floor === 'ALL' && currentExteriorMode === 'realistic');
+        });
 
-    roomMeshes.forEach(rm => {
-        const rFloor = rm.userData.roomData.floor;
-        rm.visible = (currentExteriorMode !== 'realistic') && (floor === 'ALL' || rFloor === floor);
-    });
+        roomMeshes.forEach(rm => {
+            if (rm.userData && rm.userData.roomData) {
+                const rFloor = rm.userData.roomData.floor;
+                rm.visible = (currentExteriorMode !== 'realistic') && (floor === 'ALL' || rFloor === floor);
+            }
+        });
+    }
 
     updateBld4fGlbVisibility();
     renderDirectoryList();
@@ -3326,18 +3388,45 @@ function renderBuildingFocusButtons() {
 
 function focusBuilding3D(bldId) {
     currentBuildingFilter = bldId;
+    const isBlender = (currentBld4fModelMode === 'blender');
     if (bldId === 'ALL') {
-        camTargetState.radius = 44;
-        camTargetState.theta = 0.48;
-        camTargetState.phi = 1.05;
-        camTargetState.target.set(0, 3.2, -2.5);
+        if (isBlender) {
+            camTargetState.radius = 65;
+            camTargetState.theta = 0.45;
+            camTargetState.phi = 1.05;
+            camTargetState.target.set(-10, 3.5, -20);
+        } else {
+            camTargetState.radius = 44;
+            camTargetState.theta = 0.48;
+            camTargetState.phi = 1.05;
+            camTargetState.target.set(0, 3.2, -2.5);
+        }
     } else {
-        const b = BUILDINGS_META[bldId];
-        if (b) {
-            camTargetState.radius = Math.max(22, Math.max(b.width || 20, b.depth || 15) * 1.5);
-            camTargetState.theta = 0.35;
-            camTargetState.phi = 1.12;
-            camTargetState.target.set(b.centerX, (b.floors * BASE_FLOOR_HEIGHT) / 2, b.centerZ);
+        if (isBlender) {
+            if (bldId === '4F') {
+                camTargetState.radius = 35;
+                camTargetState.theta = 0.40;
+                camTargetState.phi = 1.10;
+                camTargetState.target.set(-22.5, 7.5, -37.6);
+            } else if (bldId === '2F') {
+                camTargetState.radius = 35;
+                camTargetState.theta = 0.40;
+                camTargetState.phi = 1.10;
+                camTargetState.target.set(-15.0, 3.5, -18.0);
+            } else if (bldId === 'TTM') {
+                camTargetState.radius = 25;
+                camTargetState.theta = 0.35;
+                camTargetState.phi = 1.12;
+                camTargetState.target.set(22.0, 2.5, -42.3);
+            }
+        } else {
+            const b = BUILDINGS_META[bldId];
+            if (b) {
+                camTargetState.radius = Math.max(22, Math.max(b.width || 20, b.depth || 15) * 1.5);
+                camTargetState.theta = 0.35;
+                camTargetState.phi = 1.12;
+                camTargetState.target.set(b.centerX, (b.floors * BASE_FLOOR_HEIGHT) / 2, b.centerZ);
+            }
         }
     }
     renderDirectoryList();
@@ -3346,10 +3435,17 @@ function focusBuilding3D(bldId) {
 
 function focusSkybridge3D() {
     setExteriorMode('realistic');
-    camTargetState.radius = 20;
-    camTargetState.theta = -1.32;
-    camTargetState.phi = 1.22;
-    camTargetState.target.set(-1.5, 4.8, 0.0);
+    if (currentBld4fModelMode === 'blender') {
+        camTargetState.radius = 20;
+        camTargetState.theta = -1.25;
+        camTargetState.phi = 1.20;
+        camTargetState.target.set(-13.0, 4.5, -28.9);
+    } else {
+        camTargetState.radius = 20;
+        camTargetState.theta = -1.32;
+        camTargetState.phi = 1.22;
+        camTargetState.target.set(-1.5, 4.8, 0.0);
+    }
 }
 
 function focusBackExitRoute() {
