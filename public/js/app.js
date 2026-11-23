@@ -2724,6 +2724,9 @@ function loadSiteGroundModel() {
                 if (child.name && child.name.startsWith('Ground_09_Fences')) {
                     child.castShadow = true;
                 }
+                if (child.name === 'Guide_bld_back_4f' || child.name === 'Label_bld_back_4f') {
+                    child.visible = false;
+                }
             }
         });
         scene.add(siteGroundGroup);
@@ -2780,6 +2783,13 @@ function loadRealisticBld4FModel() {
                             obj.material.opacity = mName.includes('Frosted') ? 0.6 : 0.35;
                             obj.material.roughness = 0.1;
                             obj.material.side = THREE.DoubleSide;
+                        }
+
+                        // Fix: Hide redundant ground parking slab (40m x 24m) baked into Floor1_Structure_Walls
+                        // that covers the realistic road and traffic markings of site_ground.glb!
+                        if (mName === '20_Concrete_Park' && name.includes('Floor1_Structure')) {
+                            obj.visible = false;
+                            return;
                         }
                     }
 
