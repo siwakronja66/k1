@@ -2,11 +2,12 @@
 // Shell (html/js/css/json) and snapshot API: network-first, cached copy when offline.
 // Fonts/images: cache-first. Bump VERSION to purge old caches.
 // Admin and other API routes are never cached.
-const VERSION = 'ssj3d-v16';
+const VERSION = 'ssj3d-v17';
 const SHELL = [
     './', 'index.html', 'js/app.js', 'manifest.webmanifest', 'favicon.ico', 'favicon-32x32.png', 'favicon.png', 'apple-touch-icon.png', 'assets/logo-moph.png', 'assets/dr-Narong3.png', 'data/snapshot.json',
-    'vendor/app.css', 'vendor/fonts.css', 'vendor/three.min.js', 'vendor/fontawesome/css/all.min.css',
+    'vendor/app.css', 'vendor/fonts.css', 'vendor/three.min.js', 'vendor/GLTFLoader.js', 'vendor/fontawesome/css/all.min.css',
     'vendor/fontawesome/webfonts/fa-solid-900.woff2', 'vendor/fontawesome/webfonts/fa-regular-400.woff2',
+    'assets/site_ground.glb', 'assets/bld4f_model.glb'
 ];
 
 self.addEventListener('install', (e) => {

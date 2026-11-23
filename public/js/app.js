@@ -203,18 +203,18 @@ let explodeFactor = 0;
 let selectedRoomId = 'R431';
 let isDaylightSky = true;
 
-// Smooth Spherical Orbit Camera State
+// Smooth Spherical Orbit Camera State (Default calibrated for Blender Campus Layout)
 let camState = {
-    radius: 44,
-    theta: 0.48,
+    radius: 65,
+    theta: 0.45,
     phi: 1.05,
-    target: new THREE.Vector3(0, 3.2, -2.5)
+    target: new THREE.Vector3(-10, 3.5, -20)
 };
 let camTargetState = {
-    radius: 44,
-    theta: 0.48,
+    radius: 65,
+    theta: 0.45,
     phi: 1.05,
-    target: new THREE.Vector3(0, 3.2, -2.5)
+    target: new THREE.Vector3(-10, 3.5, -20)
 };
 let isDragging = false;
 let dragButton = 0;
@@ -2640,7 +2640,7 @@ let bld4fGlbRoof = null;
 let bld4fGlbShell = null;
 let bld4fGlbCore = null;
 let bld4fGlbLoaded = false;
-let currentBld4fModelMode = 'original'; // Default: original clean model as requested
+let currentBld4fModelMode = 'blender'; // Default: Blender realistic ground + building layout
 
 function setBld4fModelMode(mode) {
     currentBld4fModelMode = mode;
@@ -3431,6 +3431,7 @@ function focusBuilding3D(bldId) {
     }
     renderDirectoryList();
     renderBuildingFocusButtons();
+    if (typeof requestRender === 'function') requestRender();
 }
 
 function focusSkybridge3D() {
@@ -3446,6 +3447,7 @@ function focusSkybridge3D() {
         camTargetState.phi = 1.22;
         camTargetState.target.set(-1.5, 4.8, 0.0);
     }
+    if (typeof requestRender === 'function') requestRender();
 }
 
 function focusBackExitRoute() {
@@ -3454,6 +3456,7 @@ function focusBackExitRoute() {
     camTargetState.theta = 2.95;
     camTargetState.phi = 1.18;
     camTargetState.target.set(-4.0, 5.0, -12.0);
+    if (typeof requestRender === 'function') requestRender();
 }
 
 function inspectRealPhotoSpot(spotIndex) {
@@ -3472,6 +3475,7 @@ function inspectRealPhotoSpot(spotIndex) {
     document.getElementById('photo-compare-img').src = spot.img;
     document.getElementById('photo-compare-desc').textContent = spot.desc;
     card.classList.remove('hidden');
+    if (typeof requestRender === 'function') requestRender();
 }
 
 function closePhotoCompareCard() {

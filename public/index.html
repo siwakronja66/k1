@@ -212,7 +212,7 @@
     </style>
     <script src="vendor/three.min.js" defer></script>
     <script src="vendor/GLTFLoader.js" defer></script>
-    <script src="js/app.js?v=20261120A" defer></script>
+    <script src="js/app.js?v=20261123b" defer></script>
 </head>
 <body class="bg-slate-950 text-slate-100 h-screen flex flex-col overflow-hidden">
 
@@ -332,11 +332,11 @@
                 </div>
 
                 <!-- Building 4F Model Switcher: Original vs Blender Model -->
-                <div class="hidden xl:flex items-center bg-slate-950/60 p-0.5 rounded-xl border border-slate-800 ml-0.5" title="สลับโหมดโมเดลตึกหลัง">
-                    <button type="button" onclick="setBld4fModelMode('original')" id="btn-bld4f-orig" class="px-2 py-1 rounded-lg text-xs font-heading font-semibold bg-emerald-600 text-white shadow flex items-center gap-1 transition cursor-pointer">
+                <div class="flex items-center bg-slate-950/60 p-0.5 rounded-xl border border-slate-800 ml-0.5" title="สลับโหมดโมเดล">
+                    <button type="button" onclick="setBld4fModelMode('original')" id="btn-bld4f-orig" class="px-2 py-1 rounded-lg text-xs font-heading font-semibold text-slate-300 hover:bg-slate-800 hover:text-white flex items-center gap-1 transition cursor-pointer">
                         <i class="fa-solid fa-cube"></i> <span>ผังเดิม</span>
                     </button>
-                    <button type="button" onclick="setBld4fModelMode('blender')" id="btn-bld4f-blend" class="px-2 py-1 rounded-lg text-xs font-heading font-semibold text-slate-300 hover:bg-slate-800 hover:text-white flex items-center gap-1 transition cursor-pointer">
+                    <button type="button" onclick="setBld4fModelMode('blender')" id="btn-bld4f-blend" class="px-2 py-1 rounded-lg text-xs font-heading font-semibold bg-emerald-600 text-white shadow flex items-center gap-1 transition cursor-pointer">
                         <i class="fa-solid fa-shapes"></i> <span>โมเดล Blender</span>
                     </button>
                 </div>
