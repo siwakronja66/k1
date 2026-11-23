@@ -205,16 +205,16 @@ let isDaylightSky = true;
 
 // Smooth Spherical Orbit Camera State (Default calibrated for Blender Campus Layout)
 let camState = {
-    radius: 65,
+    radius: 68,
     theta: 0.45,
     phi: 1.05,
-    target: new THREE.Vector3(-10, 3.5, -20)
+    target: new THREE.Vector3(-10, 3.5, -23)
 };
 let camTargetState = {
-    radius: 65,
+    radius: 68,
     theta: 0.45,
     phi: 1.05,
-    target: new THREE.Vector3(-10, 3.5, -20)
+    target: new THREE.Vector3(-10, 3.5, -23)
 };
 let isDragging = false;
 let dragButton = 0;
@@ -2698,10 +2698,10 @@ function setBld4fModelMode(mode) {
 
     if (isBlender) {
         updateBld4fGlbVisibility();
-        camTargetState.radius = 65;
+        camTargetState.radius = 68;
         camTargetState.theta = 0.45;
         camTargetState.phi = 1.05;
-        camTargetState.target.set(-10, 3.5, -20);
+        camTargetState.target.set(-10, 3.5, -23);
     } else {
         camTargetState.radius = 44;
         camTargetState.theta = 0.48;
@@ -2832,8 +2832,8 @@ function loadRealisticBld4FModel() {
         bld4fGlbGroup.add(bld4fGlbShell);
         bld4fGlbGroup.add(bld4fGlbCore);
 
-        // Position: Building 4F center aligned with site_ground.glb Guide_bld_back_4f
-        bld4fGlbGroup.position.set(-22.5, 0.2, -37.6);
+        // Position: Building 4F center aligned with site_ground.glb Guide_bld_back_4f (v2)
+        bld4fGlbGroup.position.set(-22.5, 0.2, -41.3);
         bld4fGlbGroup.rotation.y = Math.PI;
 
         scene.add(bld4fGlbGroup);
@@ -2944,11 +2944,11 @@ function buildHTMLPins() {
             getWorldPos: () => {
                 if (currentBld4fModelMode === 'blender') {
                     if (bld.id === '4F') {
-                        return new THREE.Vector3(-22.5, 16.5 + 4 * explodeFactor * 2.5, -37.6);
+                        return new THREE.Vector3(-22.5, 16.5 + 4 * explodeFactor * 2.5, -41.3);
                     } else if (bld.id === '2F') {
                         return new THREE.Vector3(-15.0, 8.5 + 2 * explodeFactor * 2.5, -18.0);
                     } else if (bld.id === 'TTM') {
-                        return new THREE.Vector3(22.0, 5.5, -42.3);
+                        return new THREE.Vector3(22.0, 5.5, -47.0);
                     }
                 }
                 return new THREE.Vector3(
@@ -2979,7 +2979,7 @@ function buildHTMLPins() {
         type: 'executive',
         getWorldPos: () => {
             if (currentBld4fModelMode === 'blender') {
-                return new THREE.Vector3(-22.5, 12.0 + 2 * explodeFactor * 2.5, -34.5);
+                return new THREE.Vector3(-22.5, 12.0 + 2 * explodeFactor * 2.5, -38.2);
             }
             const mesh = roomMeshMap['R431'];
             if (!mesh) return new THREE.Vector3(-11, 10, -8);
@@ -3391,10 +3391,10 @@ function focusBuilding3D(bldId) {
     const isBlender = (currentBld4fModelMode === 'blender');
     if (bldId === 'ALL') {
         if (isBlender) {
-            camTargetState.radius = 65;
+            camTargetState.radius = 68;
             camTargetState.theta = 0.45;
             camTargetState.phi = 1.05;
-            camTargetState.target.set(-10, 3.5, -20);
+            camTargetState.target.set(-10, 3.5, -23);
         } else {
             camTargetState.radius = 44;
             camTargetState.theta = 0.48;
@@ -3407,7 +3407,7 @@ function focusBuilding3D(bldId) {
                 camTargetState.radius = 35;
                 camTargetState.theta = 0.40;
                 camTargetState.phi = 1.10;
-                camTargetState.target.set(-22.5, 7.5, -37.6);
+                camTargetState.target.set(-22.5, 7.5, -41.3);
             } else if (bldId === '2F') {
                 camTargetState.radius = 35;
                 camTargetState.theta = 0.40;
@@ -3417,7 +3417,7 @@ function focusBuilding3D(bldId) {
                 camTargetState.radius = 25;
                 camTargetState.theta = 0.35;
                 camTargetState.phi = 1.12;
-                camTargetState.target.set(22.0, 2.5, -42.3);
+                camTargetState.target.set(22.0, 2.5, -47.0);
             }
         } else {
             const b = BUILDINGS_META[bldId];
@@ -3440,7 +3440,7 @@ function focusSkybridge3D() {
         camTargetState.radius = 20;
         camTargetState.theta = -1.25;
         camTargetState.phi = 1.20;
-        camTargetState.target.set(-13.0, 4.5, -28.9);
+        camTargetState.target.set(-13.0, 4.5, -31.0);
     } else {
         camTargetState.radius = 20;
         camTargetState.theta = -1.32;
